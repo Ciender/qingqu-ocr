@@ -1,0 +1,45 @@
+Qingqu OCR — third-party notices / 第三方声明
+================================================
+
+Project-authored code: PolyForm-Noncommercial-1.0.0 (see LICENSE and NOTICE.txt).
+Third-party materials retain the original terms described below. The project's
+noncommercial terms do not relicense these materials.
+
+Scintilla 5.6.9 — native plain-text editor, compiled statically.
+  Upstream: https://www.scintilla.org/scintilla569.zip
+  Source and original permission: vendor/scintilla/SOURCE.txt and License.txt.
+  This distribution includes the core, headers and Win32 build sources only;
+  upstream test suites, documentation and other platform ports are omitted.
+  The included upstream source files have not been modified.
+
+Umi-OCR / GapTree — MIT, Copyright (c) 2023 hiroi-sora.
+  Rust adaptations in src/text/layout/gap_tree.rs and src/text/layout.rs.
+  Exact upstream revision and original attribution: vendor/text-layout/SOURCE.txt.
+  Full original license: vendor/text-layout/LICENSE-Umi-OCR.txt.
+  Upstream-derived portions retain their MIT terms; project-authored additions
+  are covered by the project license to the extent owned by the project author.
+
+Microsoft Fluent UI System Icons 1.1.345 — MIT.
+  Original notice: assets/icons/LICENSE-FluentUI.txt.
+  Source mapping: assets/icons/SOURCES.json.
+  The app icon and specialized state icons are project-authored artwork.
+
+VS Code Modern and Catppuccin palettes — MIT.
+  Sources and original licenses: assets/themes/SOURCES.txt and *-LICENSE.txt.
+
+fast_image_resize 6.1.0 — MIT OR Apache-2.0.
+  Resolved from Cargo; upstream source is not copied into the adapter crate.
+  vendor/picture-renderer contains the project's own adapter code.
+
+Rust dependencies
+  Cargo.lock records the exact resolved versions. licenses/components.json
+  records third-party metadata for the Windows release dependency set; the
+  corresponding license, copyright and notice texts are retained in licenses/.
+  Markdown license texts are retained verbatim with a .txt filename suffix.
+
+Windows components
+  GDI, Rich Edit/TOM2, system fonts, DPAPI and Win32 are supplied by Windows.
+  Microsoft font files and Windows system libraries are not redistributed.
+
+本项目的非商业许可仅适用于作者有权授权的原创部分；第三方源代码、算法、图标、
+配色与依赖库保留原许可。发布时请同时保留 LICENSE、NOTICE.txt、本文件及 licenses/。

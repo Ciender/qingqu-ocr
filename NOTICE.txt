@@ -1,0 +1,16 @@
+Required Notice: Copyright (c) 2026 Ciender. Qingqu OCR original project code.
+
+License scope / 许可范围
+
+Original code, documentation and original artwork contributed by Ciender are
+offered under the PolyForm Noncommercial License 1.0.0 in LICENSE. Commercial
+use of this original material is not granted by that license.
+
+Third-party source code, algorithms, icons, palettes and libraries retain their
+own licenses. This notice does not replace or restrict rights granted by those
+licenses. See THIRD_PARTY_NOTICES.txt, licenses/ and component-specific notices.
+The Umi-OCR-derived layout portions retain their upstream MIT attribution.
+
+本项目原创代码、文档和原创图形采用 LICENSE 中的 PolyForm Noncommercial 1.0.0，
+仅授权该许可证允许的用途，不授予商业使用许可。第三方组件继续适用各自的原始许可，
+本声明不缩减其原许可授予的权利。基于 Umi-OCR 的排版部分保留 MIT 来源与版权声明。
