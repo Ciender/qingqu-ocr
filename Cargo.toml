@@ -1,0 +1,58 @@
+[package]
+name = "qingqu-ocr-native"
+version = "0.3.0"
+edition = "2021"
+license = "PolyForm-Noncommercial-1.0.0"
+repository = "https://github.com/Ciender/qingqu-ocr-native"
+readme = "README.md"
+publish = false
+description = "轻取 OCR：轻量 Windows 截图文字识别"
+
+[dependencies]
+base64 = "0.22"
+arboard = "3.7"
+ferrous-opencc = "0.4"
+md5 = "0.8"
+regex = "1"
+pulldown-cmark = { version = "0.13", default-features = false }
+windows = { version = "0.62", features = ["Win32_UI_Controls_RichEdit", "Win32_System_Com", "Win32_System_Ole", "Win32_System_Variant"] }
+unicode-segmentation = "1.13"
+textwrap = { version = "0.16", default-features = false, features = ["unicode-width", "unicode-linebreak"] }
+async-openai = { version = "0.42", default-features = false, features = ["native-tls", "chat-completion", "byot"] }
+tokio = { version = "1", features = ["rt", "time"] }
+futures-util = "0.3"
+secrecy = "0.10"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp"] }
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "json", "form", "multipart", "native-tls", "system-proxy"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation", "Win32_Security", "Win32_Graphics_Gdi", "Win32_Security_Cryptography",
+    "Win32_System_DataExchange", "Win32_System_LibraryLoader", "Win32_System_Memory",
+    "Win32_System_Threading", "Win32_UI_HiDpi", "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_System_Registry",
+    "Win32_System_Diagnostics_Debug", "Win32_UI_Controls_Dialogs", "Win32_Graphics_Dwm",
+    "Win32_System_SystemInformation",
+    "Win32_UI_Controls", "Win32_System_ProcessStatus", "Win32_Storage_Xps"
+] }
+quick-xml = "0.41.0"
+qingqu-picture-renderer = { path = "vendor/picture-renderer" }
+
+[build-dependencies]
+cc = "1.2"
+resvg = { version = "0.49", default-features = false }
+winresource = { version = "0.1.34", default-features = false }
+
+[profile.release]
+opt-level = "s"
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+
+[profile.release.package.fast_image_resize]
+opt-level = 3
+
+[profile.release.package.qingqu-picture-renderer]
+opt-level = 3
+
