@@ -1,0 +1,9 @@
+# 图片渲染适配模块
+
+这是本项目的 Rust 显示适配代码，不是复制的第三方库源码。实际卷积使用 Cargo.lock 锁定的 fast_image_resize 6.1.0（MIT OR Apache-2.0）：
+https://github.com/Cykooz/fast_image_resize/tree/v6.1.0
+https://docs.rs/fast_image_resize/6.1.0/fast_image_resize/
+
+只启用 std 和 only_u8x4；不引入 rayon、解码器、GPU 或 DLL。使用运行时 CPU 指令集检测、像素中心坐标与自适应 Bilinear 卷积核。缩小时滤波核按比例扩宽；保持与放大同一滤波函数，避免切换 Box/Linear 引起细节闪变。
+
+适配层负责保留小数相位、旋转、图像边缘扩展、分块和 BGRA 合成。分块限制输出至 1024×64、源覆盖约 512×512，卷积支持区另计；原图从现有只读映射借用。只有边缘和旋转块需要小块复制。连续动画复用工作区，结束后由调用者 Drop 回收。发布包保留上游 MIT/Apache 许可证；独立 crate 仅为了对热循环启用 opt-level=3，主程序仍用 opt-level=s。

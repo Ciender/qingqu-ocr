@@ -1,0 +1,9 @@
+[package]
+name = "qingqu-picture-renderer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "PolyForm-Noncommercial-1.0.0"
+
+[dependencies]
+fast_image_resize = { version = "=6.1.0", default-features = false, features = ["std", "only_u8x4"] }
