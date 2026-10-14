@@ -1,0 +1,187 @@
+{
+  "package": "@fluentui/svg-icons",
+  "version": "1.1.345",
+  "repository": "https://github.com/microsoft/fluentui-system-icons",
+  "git_commit": "73ec879377b1f412f33aca4a128aa967e6c238f0",
+  "license": "LICENSE-FluentUI.txt",
+  "icons": {
+    "scan-text.svg": {
+      "source": "scan_type_24_regular.svg",
+      "sha256": "f2df534dec98470ff771ec91c2f96a35fb12ded73327fec5732327d686191449"
+    },
+    "table.svg": {
+      "source": "table_24_regular.svg",
+      "sha256": "ab55957aa4f48b180009245b56dd105ba1a497326582de53440b9fe8ae92fce5"
+    },
+    "vertical.svg": {
+      "source": "text_direction_vertical_24_regular.svg",
+      "sha256": "3e7b745fad5f0ae49f877b270beaaaa5968fcf8adfb163ff64bead0ee816a48d"
+    },
+    "formula.svg": {
+      "source": "math_formula_24_regular.svg",
+      "sha256": "a147884769dfd582680cbb856c4f9f6f46e90b2fff0e140896c31f74f3caed6e"
+    },
+    "clipboard.svg": {
+      "source": "clipboard_24_regular.svg",
+      "sha256": "f04fde32802673a811b3745ee3d68654d0231e8ba498f22173e91483e5670384"
+    },
+    "image.svg": {
+      "source": "image_24_regular.svg",
+      "sha256": "028a9cc4eba4b6f9c2264ace17983661011703ab28977258c16040d83e98aa5d"
+    },
+    "paragraph.svg": {
+      "source": "text_grammar_wand_24_regular.svg",
+      "sha256": "a9062d80f4969d361ec5b5e98f361971c18c0212c33356635c99a97cb3a50f7b"
+    },
+    "split.svg": {
+      "source": "text_bullet_list_24_regular.svg",
+      "sha256": "b250f00cdfa95365bb46c0c6ee1ef7529cc8291c3caed8be65af294fb98fd80c"
+    },
+    "merge.svg": {
+      "source": "text_align_justify_24_regular.svg",
+      "sha256": "a5996216132eafc2dcab6809e97153e17fb3814e196d8ac3283d0bca84712e09"
+    },
+    "punctuation.svg": {
+      "source": "text_quote_24_regular.svg",
+      "sha256": "586bd281a103d01e7b473ef0b9cb017f1dbf11e77d40965d1923afbc343f14d3"
+    },
+    "translate.svg": {
+      "source": "translate_24_regular.svg",
+      "sha256": "71f176c54ffbd8e4f85ddfb90b3333ed89fae9d1fec931408f1ed1bced1d75f7"
+    },
+    "copy.svg": {
+      "source": "copy_24_regular.svg",
+      "sha256": "df92d70f05a1b0e771ad8fc2383c23d6ac7178bda3b4e7a57e5a03972fa9c1e8"
+    },
+    "delete.svg": {
+      "source": "delete_24_regular.svg",
+      "sha256": "04c0fc28e66541a55699e32de594c7d50cec3ce5f6f09173d0ce8e2ea685c97d"
+    },
+    "undo.svg": {
+      "source": "arrow_undo_24_regular.svg",
+      "sha256": "97594666816801cf7c634dda715a5dfe6808dc5a7ea4a81880e23f10cf173a29"
+    },
+    "search.svg": {
+      "source": "search_24_regular.svg",
+      "sha256": "7616f8b854157e435a4c7556eebe10a4be065b3380913aba4b1f77f6aeb32ee6"
+    },
+    "pin.svg": {
+      "source": "pin_24_regular.svg",
+      "sha256": "8dd9fcf17c2734bd035b13377457aa8908e7c9344572c1a7baab83bc33946a90"
+    },
+    "menu.svg": {
+      "source": "more_horizontal_24_regular.svg",
+      "sha256": "b867db7b6a08e04fe34cdda325a1c300546c9cfc981cf1a75048643a70f36b6f"
+    },
+    "minimize.svg": {
+      "source": "subtract_24_regular.svg",
+      "sha256": "1681f591eb7e39eff10ca24f7083d2ca6c6248c11a1353078f9c46b2274a259d"
+    },
+    "maximize.svg": {
+      "source": "square_24_regular.svg",
+      "sha256": "0edc68fd58267a5d7d3a4d14373028b9b039e776a7a8d8e071d1d7a9449e195b"
+    },
+    "close.svg": {
+      "source": "dismiss_24_regular.svg",
+      "sha256": "7cff7ed321daa78ab1e9346e182c5416d4f1ae88b3d9bf7742f2497be37a7cc5"
+    },
+    "api.svg": {
+      "source": "code_24_regular.svg",
+      "sha256": "69e2c978bc3abf345f23be3a1e019740da59bcd3a4047e2acea6d54b4e674092"
+    },
+    "keyboard.svg": {
+      "source": "keyboard_24_regular.svg",
+      "sha256": "857b01bc0f8bfc6f54256f0e3274e40495f4b41718444005bdf175ebd8ccd774"
+    },
+    "appearance.svg": {
+      "source": "dark_theme_24_regular.svg",
+      "sha256": "42ff9c046f670d9e7a68d893edf1896bf34d65cb94d1c83a05f3081aaf1e1a5c"
+    },
+    "settings.svg": {
+      "source": "settings_24_regular.svg",
+      "sha256": "2d6d320d21346d519f87261c3ce941272b6f6bf54350ed3f00c5494e99f7804f"
+    },
+    "eye.svg": {
+      "source": "eye_24_regular.svg",
+      "sha256": "97e7dbff6e40422a84db3034b3086f0403de8f665cf590ee8ddc02cb9cda1097"
+    },
+    "zoom-in.svg": {
+      "source": "zoom_in_24_regular.svg",
+      "sha256": "1c8d96a0ed54d30115552b742fc3f1938abba06c3a1f83ce041a088a52b3f695"
+    },
+    "zoom-out.svg": {
+      "source": "zoom_out_24_regular.svg",
+      "sha256": "ffd5b2638f4c408d9a72f5ee6fab0016a93eeb5a9b8e81772a39860cdcd874da"
+    },
+    "fit.svg": {
+      "source": "zoom_fit_24_regular.svg",
+      "sha256": "d9de5fc165ad61c58a329ebb2a9ae09407f01f9d3aa803611400dd63af0251dc"
+    },
+    "rotate-left.svg": {
+      "source": "arrow_rotate_counterclockwise_24_regular.svg",
+      "sha256": "e373f40eec5cef57660d0d018060e0d48652fcc1c443c1fe67755a01f65d41f4"
+    },
+    "rotate-right.svg": {
+      "source": "arrow_rotate_clockwise_24_regular.svg",
+      "sha256": "7b3e2c90da937ca78ed6f33bae5f4e1f362929aae5046c02783e2aa99b713d94"
+    },
+    "window.svg": {
+      "source": "window_24_regular.svg",
+      "sha256": "ddcaef90add10f8a626973bdffa7411280c6c45dec3c151ee61781a506461e6d"
+    },
+    "actual-size.svg": {
+      "source": "ratio_one_to_one_24_regular.svg",
+      "sha256": "b1a3a4aeb3d91d78c0b3de443381578e3bf05417a3849bcfe6d25a9bcb1fd34d"
+    },
+    "grip.svg": {
+      "source": "re_order_dots_vertical_24_regular.svg",
+      "sha256": "081162a44117292d3b636576b018ca58c31256cf2379db9d74253a13543d9ab2"
+    },
+    "pin-off.svg": {
+      "source": "pin_off_24_regular.svg",
+      "sha256": "74dff868fa0016656786414ea5f866e66177e038907075037a04cee7bc3e4900"
+    },
+    "paste.svg": {
+      "source": "clipboard_paste_24_regular.svg",
+      "sha256": "27d14e403eddb6182076521137f59f292b2f8c9052a720bb91c43cea5272c882"
+    },
+    "cut.svg": {
+      "source": "cut_24_regular.svg",
+      "sha256": "63e79523f21a1f2ec19a016bcab3e948c94156904627f3e64f54f490e441daf9"
+    },
+    "redo.svg": {
+      "source": "arrow_redo_24_regular.svg",
+      "sha256": "ff3915082dd494c7952ca8571a01615e701698b1ca940f0889489a2514fff635"
+    },
+    "line-numbers.svg": {
+      "source": "text_number_list_ltr_24_regular.svg",
+      "sha256": "54857b9968e40a77d0aca8400a3860d8e6476ad78d5b3f2bcb2fcdd787b8d2bf"
+    },
+    "chevron-down.svg": {
+      "source": "chevron_down_24_regular.svg",
+      "sha256": "ee9fd7bce0165d8da4a34e6ec5056873e5eb55102d78321bfba858daff28a36e"
+    },
+    "auto-paragraph.svg": {
+      "source": "text_bullet_list_square_sparkle_24_regular.svg",
+      "sha256": "29785545b3f7dd2cec14e9e9737f77cc65f51e9048f3fa880214ff4a90ba4385"
+    },
+    "help-circle.svg": {
+      "source": "question_circle_24_regular.svg",
+      "sha256": "f4a98c23c410cd8781870184f5622d4946add8a0d76d368667d1daec5d94f2f3"
+    }
+  },
+  "custom_icons": [
+    "chinese-convert.svg",
+    "chinese-simplified.svg",
+    "chinese-traditional.svg",
+    "punctuation-chinese.svg",
+    "punctuation-english.svg"
+  ],
+  "custom_note": "Qingqu custom glyphs: diagonal simplified/traditional Chinese with cyclic arrows in three states, and Chinese/English punctuation. Not supplied by Microsoft.",
+  "application_icon": {
+    "source": "../app.svg",
+    "origin": "Qingqu original artwork; approved app-icon-concept-20261105 PNG design.",
+    "modification": "Blue rounded square, white scan corners and T, cyan recognition baseline. Not supplied by Microsoft.",
+    "sha256": "69da82c1d9c678070fd1ed39959d58678021f6259e02ca1ddec5cf3bcfaa009a"
+  }
+}

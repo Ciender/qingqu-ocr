@@ -1,0 +1,12 @@
+# Scintilla 5.6.9
+
+Official source: https://www.scintilla.org/scintilla569.zip
+
+Archive SHA-256: `fddc637afa6e3a9205a5ad67c777d711a921ed2797d792f3034010c1be1539d6`
+
+License: [License.txt](License.txt). Upstream files are unmodified. `build.rs`
+compiles the core and Win32 platform sources into a static library; it does not
+include SciTE, Lexilla, or language lexers. The original source archive is kept
+as an expanded vendor directory for reproducible, offline builds.
+
+Documentation: https://www.scintilla.org/ScintillaDoc.html

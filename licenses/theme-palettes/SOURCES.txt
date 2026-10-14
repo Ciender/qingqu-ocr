@@ -1,0 +1,15 @@
+# Palette sources
+
+The application maps interface colors from these MIT-licensed upstream themes
+to egui 0.37 visual roles. Layout, widgets and SVG icons remain project code.
+No VS Code extensions, editor runtime or third-party theme crate are shipped.
+
+- VS Code Modern: https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes
+  - `vscode-dark-modern.json`, `vscode-light-modern.json` are upstream snapshots.
+  - License: `vscode-LICENSE.txt`, copyright Microsoft Corporation.
+- Catppuccin: https://github.com/catppuccin/palette
+  - `catppuccin-palette.json` is the upstream palette snapshot.
+  - Dark uses Mocha; light uses Latte. Hover and selection roles use palette surfaces.
+  - License: `catppuccin-LICENSE.txt`, copyright Catppuccin.
+
+Retrieved 2026-10-31. Color constants are in `src/appearance.rs`.

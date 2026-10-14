@@ -1,0 +1,8 @@
+# Lightweight text layout sources
+
+- `src/text/layout/gap_tree.rs`: Rust adaptation of hiroi-sora's GapTree reading-order algorithm, from Umi-OCR revision `83173efc4f4453b41223ea96d63d44534bf0505c`, MIT, Copyright (c) 2023 hiroi-sora. Original: https://github.com/hiroi-sora/Umi-OCR/blob/83173efc4f4453b41223ea96d63d44534bf0505c/UmiOCR-data/py_src/ocr/tbpu/parser_tools/gap_tree.py
+- `src/text/layout.rs`: paragraph-alignment approach adapted from the same revision's `parser_tools/paragraph_parse.py`, combined with original local-leading, provider-hint validation and protected-structure rules. Original: https://github.com/hiroi-sora/Umi-OCR/blob/83173efc4f4453b41223ea96d63d44534bf0505c/UmiOCR-data/py_src/ocr/tbpu/parser_tools/paragraph_parse.py
+- Existing `textwrap` crate: `unfill` joins known English paragraph wraps; `fill` is used by the width-wrap tool. Its dependency license is packaged separately from Cargo metadata.
+- `src/text/prose.rs`: original conservative whitespace normalization, informed by the separation of copywriting cleanup from layout in AutoCorrect (https://github.com/huacnlee/autocorrect). No AutoCorrect code, spelling dictionaries, or runtime dependencies are included. Punctuation remains the project's independently controlled, token-protected transformation.
+
+The application ships Rust code only for this feature. It does not bundle Python, Qt, an OCR model, or a layout model from these projects. The original Umi-OCR MIT notice is retained in `LICENSE-Umi-OCR.txt`.
