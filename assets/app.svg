@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <title>轻取 OCR — 扫描取字</title>
+  <desc>蓝色圆角底，白色扫描边角与字母 T，青色识别基线。全部图形均为矢量路径，无字体依赖。</desc>
+  <defs>
+    <linearGradient id="tile" x1="38" y1="24" x2="211" y2="240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#269CF1"/>
+      <stop offset=".48" stop-color="#1478DC"/>
+      <stop offset="1" stop-color="#1751BB"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#tile)"/>
+  <path d="M96 64H80C71.163 64 64 71.163 64 80V96M160 64H176C184.837 64 192 71.163 192 80V96M64 160V176C64 184.837 71.163 192 80 192H96M192 160V176C192 184.837 184.837 192 176 192H160" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M103 88H153C156.866 88 160 91.134 160 95V98C160 101.866 156.866 105 153 105H137V143C137 147.971 132.971 152 128 152C123.029 152 119 147.971 119 143V105H103C99.134 105 96 101.866 96 98V95C96 91.134 99.134 88 103 88Z" fill="#FFFFFF"/>
+  <path d="M101 171H155" stroke="#8DE8F6" stroke-width="10" stroke-linecap="round"/>
+</svg>
