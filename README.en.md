@@ -1,167 +1,133 @@
-<div align="center">
+<p align="center">
+  <img src="assets/app.svg" width="72" height="72" alt="Qingqu OCR icon">
+</p>
 
-<img src="assets/app.svg" width="88" alt="Qingqu OCR icon">
+<h1 align="center">Qingqu OCR · Win32 Native</h1>
 
-# Qingqu OCR · 轻取 OCR
+<p align="center">Capture text · Translate side by side · Format paragraphs · Pin images</p>
 
-**Capture text, translate, format documents, and pin reference images on Windows.**
+<p align="center">
+  <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4" alt="Windows 10 / 11 x64">
+  <img src="https://img.shields.io/badge/version-0.3.0-2563EB" alt="Version 0.3.0">
+  <img src="https://img.shields.io/badge/Rust-Win32-DEA584" alt="Rust + Win32">
+  <img src="https://img.shields.io/badge/license-Noncommercial-64748B" alt="Noncommercial license">
+</p>
 
-[简体中文](README.md) · [Features](#features) · [Screenshots](#screenshots) · [Getting started](#getting-started) · [Build from source](#build-from-source) · [License](#license)
+<p align="center">
+  <a href="README.md">简体中文</a> ·
+  <a href="#getting-started">Getting started</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#build-from-source">Build</a> ·
+  <a href="#license">License</a>
+</p>
 
-![Platform](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4)
-![Version](https://img.shields.io/badge/version-0.3.0-2563EB)
-![Stack](https://img.shields.io/badge/Rust-Win32%20Native-DEA584)
-![License](https://img.shields.io/badge/license-Noncommercial-64748B)
+Qingqu OCR is a Windows application for extracting and organizing text. This repository contains the **Rust + Win32 native rewrite**: capture screen content, edit and translate it, preview formulas, and copy tables in one workspace. Clipboard text and images can also become independent desktop notes and pinned windows.
 
-</div>
-
-Qingqu OCR is a Windows 10/11 x64 desktop application for turning screen content into editable text. Continue with translation, paragraph cleanup, formula previews, and editable table copying, or pin clipboard text and images in independent desktop windows.
-
-The application uses Rust, Win32, Scintilla, system Rich Edit/TOM2, and GDI. Scintilla is linked statically, with no separate editor DLL to install. The runtime does not bundle a browser, WebView, Python, OCR models, or TeX. **OCR uses the cloud service you configure and requires network access and the corresponding service permissions.**
-
-> Original project materials are licensed for noncommercial purposes under [PolyForm Noncommercial 1.0.0](LICENSE). Third-party components retain their original licenses. See [License](#license).
+Built with Scintilla, system Rich Edit, and GDI, the application runs directly after extraction. **OCR uses your configured cloud provider and requires network access and API permissions.** Original project materials are licensed for noncommercial purposes.
 
 ## Features
 
-| Area | Implemented capabilities |
+| Feature | Capabilities |
 |---|---|
-| Screen capture | Frozen capture of the monitor under the pointer, window preselection, region selection, and full-monitor recognition; cancel with Esc or right-click |
-| Recognition tasks | Plain text, tables, vertical text, and formulas; language controls follow endpoint capabilities |
-| Service routing | Saved API connections with independent bindings for text, tables, vertical text, formulas, translation, and pinned images |
-| Translation | Manual or automatic translation, target-language switching, streaming for compatible endpoints, and a two-pane source/translation workspace |
-| Text editing | Native Scintilla editing, logical line numbers, wrapping, search, selections, undo/redo, and font-size controls |
-| Paragraphs | Automatic paragraphs, original OCR lines, or merged text; layout-aware reading order and alignment rules |
-| Formatting | Cleanup of current text or selection, conservative line joining, and protection for code, formulas, URLs, and related structures |
-| Conversion | Chinese/English punctuation modes, Simplified/Traditional Chinese conversion, indentation, and paragraph-spacing preferences |
-| Document previews | Editable LaTeX source with inline formula or Markdown preview; copying a preview preserves its source |
-| Tables | Multiple tables, empty cells, merged spans, explicit captions/footnotes, and RTF / Excel XML Spreadsheet / TSV clipboard output |
-| Clipboard notes | `Alt+V` opens current clipboard text as a note or an image as an independent pinned window |
-| Pinned images | Pointer-anchored smooth zoom, rotation, fit-to-screen, always-on-top, dragging, independent OCR, and an optional information bar |
-| Image copying | PNG, DIBV5, file-list, and path-text clipboard formats; full original image pixels without the information bar |
-| Desktop integration | System tray, configurable global shortcuts, floating toolbar, optional startup, and single-instance protection |
-| Appearance | Light and dark VS Code Modern / Catppuccin palettes, SVG icons, and DPI-aware layout |
-| Session | Independent source/translation undo histories, tray persistence, and shared original images with per-window rotation |
+| Screen OCR | Freeze the current monitor, preselect a window or drag a region; recognize text, tables, vertical text, and formulas |
+| Translation | Side-by-side source and translation, manual or automatic requests, target-language switching, and streaming for compatible APIs |
+| Text editing | Line numbers, wrapping, search, selections, font controls, and separate source/translation undo and redo |
+| Formatting | Automatic paragraphs, original OCR lines, merged paragraphs, smart cleanup, punctuation conversion, Simplified/Traditional Chinese, indentation, and paragraph spacing |
+| Formulas and Markdown | Edit source on the left and preview natively on the right; copying preserves LaTeX / Markdown source |
+| Tables | Multiple tables, empty cells, merged spans, captions, and footnotes; copy into Word / Excel for further editing |
+| Notes and images | `Alt+V` opens the current clipboard content; images support zoom, rotation, dragging, pinning, information bars, and independent OCR |
+| Task routing | Independent service and endpoint bindings for text, tables, vertical text, formulas, translation, and images |
+| Desktop integration | Tray, global shortcuts, floating toolbar, startup option, single instance, and light/dark VS Code Modern / Catppuccin palettes |
 
 ## Screenshots
 
-These are captures of the actual application UI with illustrative content. Every image uses a **1440 × 960** canvas; windows keep their aspect ratios and are padded to fit. The examples demonstrate the interface, not cloud recognition accuracy or performance. The application UI is currently primarily Chinese.
+Actual application captures with illustrative content. All images use a **960 × 600** canvas and preserve window proportions; click to view full size. Some captures come from earlier native builds, so individual controls may differ from the current application.
 
-### Source and translation
-
-![Two-pane source and translation workspace](docs/screenshots/workspace.png)
-
-### Formula and document preview
-
-![Formula source and native preview](docs/screenshots/formula-preview.png)
-
-### Table recognition results
-
-![Table text and native table preview](docs/screenshots/tables.png)
-
-### Task-specific API bindings
-
-![Independent task, service, and endpoint selection](docs/screenshots/task-bindings.png)
-
-### Dark appearance
-
-![Workspace in a dark theme](docs/screenshots/dark-theme.png)
-
-### Clipboard notes and pinned images
-
-![Independent text note and image window](docs/screenshots/clipboard-windows.png)
+<table>
+  <tr>
+    <td align="center"><a href="docs/screenshots/workspace.png"><img src="docs/screenshots/workspace.png" width="320" alt="Two-pane source and result workspace"></a><br><strong>Two-pane workspace</strong></td>
+    <td align="center"><a href="docs/screenshots/formula-preview.png"><img src="docs/screenshots/formula-preview.png" width="320" alt="Formula source and native preview"></a><br><strong>Formula preview</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screenshots/tables.png"><img src="docs/screenshots/tables.png" width="320" alt="Recognized text and table structure"></a><br><strong>Table recognition</strong></td>
+    <td align="center"><a href="docs/screenshots/task-bindings.png"><img src="docs/screenshots/task-bindings.png" width="320" alt="Task, API service, and endpoint bindings"></a><br><strong>Task bindings</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screenshots/dark-theme.png"><img src="docs/screenshots/dark-theme.png" width="320" alt="Formula preview in a dark theme"></a><br><strong>Dark theme</strong></td>
+    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="Independent clipboard note and pinned image"></a><br><strong>Notes and pinned images</strong></td>
+  </tr>
+</table>
 
 ## Getting started
 
-### Requirements
+**Requirements: Windows 10 / 11, x64.** No separate Python, browser engine, editor DLL, or TeX installation is needed. Word / Excel is only required as a destination for editable tables.
 
-- Windows 10 or Windows 11, x64.
-- Network access to the configured provider for OCR and online translation.
-- Your own credentials and enabled cloud API permissions where required. The application does not provide API keys or guarantee free quotas.
-- Word or Excel is only needed as a destination for editable tables; Office is not required to run Qingqu OCR.
+1. Extract `qingqu-ocr-native-0.3.0-windows-x64.zip` and run `qingqu-ocr-native.exe`. Fully exit the previous version from the tray before updating.
+2. Open **Settings → API services** (`设置 → API 服务`). Enter your provider credentials and the required region, model, or endpoint.
+3. Open **Settings → Task bindings** (`设置 → 调用配置`). Choose the task, service, and endpoint, then save and apply.
+4. Press **`Ctrl+Shift+O`**, click a preselected window or drag a region, and release to recognize. Edit, translate, format, or copy the result.
 
-### Install and configure
+Image OCR can follow the text configuration or use its own binding. Cloud services may charge for requests; the application does not supply API keys. Available endpoints, languages, and account permissions depend on the provider.
 
-1. Obtain the Windows x64 ZIP from this repository's **Releases**, extract it, and run `qingqu-ocr-native.exe`. No installer is required.
-2. Before updating, fully exit the previous version from the tray. Retain the license files and third-party notices in the package.
-3. Open **Settings → API services** (`设置 → API 服务`) and enter the required keys, region, model, or custom endpoint.
-4. Open **Settings → Task bindings** (`设置 → 调用配置`), bind each task to a service and endpoint, then save and apply.
-5. Press `Ctrl+Shift+O` and select screen content. Edit recognized text on the left, then translate, format, preview, or copy it.
+### Supported services
 
-Pinned-image OCR can follow the text task or use an independent binding. Changing the text provider does not replace bindings for tables, formulas, or other tasks.
-
-### Common workflows
-
-| Goal | Steps |
+| Provider | Adapted tasks or capabilities |
 |---|---|
-| Capture text | `Ctrl+Shift+O` → click a preselected window or drag a region → release to recognize |
-| Translate a capture | Configure translation → enable automatic translation → recognize; the translation button also runs a single manual request |
-| Clean pasted text | Paste on the left → Smart formatting; externally pasted text is merged into one line, with paragraph controls available to restore or reorganize it |
-| Extract formulas | Choose formula recognition → retain LaTeX on the left and inspect the preview on the right |
-| Extract tables | Choose table recognition → review the structure → copy a table or selection → paste into Word / Excel |
-| Pin reference material | Copy text or an image → `Alt+V` → use an independent note or image window |
-| Recognize a pinned image | Right-click the image → Recognize image; the full original image is used with its current rotation |
+| Baidu OCR | Text, tables, vertical text, formulas, and related document-analysis endpoints |
+| Tencent Cloud OCR | Text, table, and vertical-text endpoints |
+| Alibaba Cloud standalone OCR | General text, high-accuracy documents, tables, and formulas |
+| Alibaba Cloud unified OCR | Task-specific text, handwriting, multilingual, and table types |
+| Model Studio Qwen-OCR / Qwen-VL | Adapted text, table, vertical-text, and formula tasks using native or compatible protocols, depending on the model |
+| Mathpix | Formula recognition |
 
-## Provider support
+Translation has seven entries: **Google, Microsoft, Index Translate, OpenAI-compatible, Baidu, Alibaba Cloud, and Tencent**. Google / Microsoft offer web-service paths or adapted official APIs. Custom compatible services accept your endpoint, model, and key. OCR language and translation target language are configured separately; the client does not automatically switch to another paid service.
 
-This table describes the integrations implemented by this client. Available models, regions, languages, quotas, and account permissions depend on the provider and the capabilities exposed in Settings.
+Traditional Alibaba Cloud AccessKey credentials are configured separately from Model Studio API keys. Question-mark cards in Settings provide endpoint information and official links, not live account balances. Provider documentation governs model availability, permissions, prices, and quotas.
 
-| Provider | Client integrations | Configuration |
-|---|---|---|
-| Baidu OCR | Text, tables, vertical text, formulas, and related document-analysis endpoints | API Key / Secret Key; check provider notices for legacy formula availability |
-| Tencent Cloud OCR | Text, table, and vertical-text endpoints | SecretId / SecretKey and region |
-| Alibaba Cloud standalone OCR | Adapted text, high-accuracy document, table, and formula endpoints | Traditional cloud AccessKey credentials, separate from Model Studio API keys |
-| Alibaba Cloud unified OCR | Task-specific unified text, handwriting, multilingual, and table types | Bindings are saved independently for each task |
-| Model Studio Qwen-OCR / Qwen-VL | Adapted text, table, vertical-text, and formula tasks using native or compatible protocols | API key, model, region, workspace, and protocol; capabilities vary by model |
-| Mathpix | Formula recognition | Corresponding application credentials |
+### Shortcuts
 
-Translation has seven entries: **Google, Microsoft, Index Translate, OpenAI-compatible, Baidu, Alibaba Cloud, and Tencent**. Google / Microsoft support the default web-service path or adapted official APIs. Web-service paths may stop working after provider changes. Index and custom compatible services save separate URLs, models, and keys. The client does not automatically switch to another paid service.
-
-Question-mark cards in Settings contain provider information and official links. They do not query account balances or guarantee current prices or quotas. `Unlimited-OCR-2` has legacy configuration fields only; recognition is not implemented.
-
-## Shortcuts and windows
-
-| Shortcut / action | Default behavior |
+| Shortcut | Action |
 |---|---|
-| `Ctrl+Shift+O` | Window preselection or region capture |
+| `Ctrl+Shift+O` | Capture a preselected window or region for OCR |
 | `Ctrl+Shift+Q` | Show the main window |
 | `Alt+V` | Open current clipboard text / image in an independent window |
-| `Esc` | Minimize the main window, cancel capture, or close an image/secondary window |
-| `Ctrl+C` / `Ctrl+X` / `Ctrl+V` | Copy / cut / paste text |
+| `Ctrl+C` / `Ctrl+X` / `Ctrl+V` | Copy / cut / paste |
 | `Ctrl+Z` / `Ctrl+Y` | Undo / redo |
-| `Ctrl++` / `Ctrl+-` / `Ctrl+0` | Change editor font size / restore size 14 |
-| Image mouse wheel | Zoom around the image point under the pointer |
-| Image context menu | Copy, rotate, enter scale, fit, pin, toggle information, recognize, or close |
-| Tray → Exit | Fully close all application windows and background work |
+| `Ctrl++` / `Ctrl+-` / `Ctrl+0` | Change font size / restore size 14 |
+| `Esc` | Minimize the main window, cancel capture, or close an image/secondary window |
+| Image wheel / right-click | Pointer-anchored zoom / image actions menu |
 
-Global shortcuts are configurable. Closing the main window normally sends it to the tray. Undo histories last for the current process and end when the application fully exits.
+Global shortcuts are configurable. Closing the main window normally sends it to the tray; choose Exit from the tray to close the application completely.
 
-## Result handling
+<details>
+<summary><strong>Formatting, tables, and image workflows</strong></summary>
 
-**Paragraphs.** Automatic mode uses reading order, local spacing, alignment, and reliable provider hints. Existing logical lines are preserved when coordinates are unavailable. Split mode retains OCR lines; merge mode explicitly removes all line breaks. Smart formatting is a separate action and does not change the default paragraph mode for later OCR requests.
+- **Paragraphs:** Automatic mode uses reading order, alignment, spacing, and reliable provider hints. Split mode retains OCR lines; merge mode removes all line breaks. Smart formatting separately processes current text or selection without changing the default mode for later OCR. Externally pasted text can be merged into one line and restored or reorganized with paragraph controls.
+- **Text protection:** Formatting protects code, formulas, URLs, and related structures. Settings control indentation and paragraph spacing. Manual edits are not overwritten by stale recognition content.
+- **Table copying:** Whole tables and selections provide RTF, Excel XML Spreadsheet, and TSV, preserving cell line breaks, merged spans, leading zeros, and long identifiers. Review provider mistakes, missing cells, and incorrect merges.
+- **Formulas / Markdown:** Common fractions, roots, scripts, headings, lists, and code are supported. Math delimiters include `$...$`, `$$...$$`, `\(...\)`, and `\[...\]`. HTML is displayed literally; scripts and remote images are not loaded. Complex TeX macros are not guaranteed. Previews exceeding 256 KiB or 8192 formatting spans fall back to source.
+- **Pinned images:** Manual scale ranges from 1–800%, with smooth wheel zoom, rotation, fit-to-screen, pinning, information bars, and explicit OCR. Display zoom does not change original pixels. Recognition uses the full original with its current rotation; copying excludes borders and information bars.
+- **Image copying:** Lossless PNG, DIBV5, file-list, and path-text formats are offered together. The receiving application chooses a supported format; a text-only target may receive the PNG path.
+- **Sessions:** Content and undo histories remain while the app is in the tray and end when the process exits. Identical images can share the original while retaining per-window rotation.
 
-**Tables.** Structure comes from provider JSON. Clipboard output preserves merged spans, cell line breaks, leading zeros, and long identifiers. Review recognition mistakes, missing cells, and incorrect merges. The left TSV pane scrolls horizontally; the right pane uses a native table viewer. Tables can be edited after pasting into Word / Excel.
+</details>
 
-**Formulas and Markdown.** Windows Rich Edit/TOM2 handles formulas, and pulldown-cmark parses Markdown. Common roots, fractions, scripts, headings, lists, and code are supported, with `$...$`, `$$...$$`, `\(...\)`, and `\[...\]` math delimiters. HTML is displayed literally; scripts are not executed and remote images are not loaded. Rendering is not a complete TeX or browser implementation, and complex macros depend on system capabilities. Previews larger than 256 KiB or 8192 formatting spans fall back to source.
+## Data and privacy
 
-**Images.** Manual scale ranges from 1–800%, with smooth convergence for continuous wheel input. Runtime-dispatched SIMD adaptive Bilinear filtering from `fast_image_resize` uses bounded tiles. Display buffers are separate from original pixels, so copying excludes borders, shadows, and information bars. Windows may move partly off-screen while retaining a reachable area.
+OCR images and translation text are sent to your chosen services. Automatic translation also sends recognized text to the configured translation provider. **Opening clipboard notes or images with `Alt+V` does not itself upload content.**
 
-## Data, credentials, and network use
+Preferences are stored at `%LOCALAPPDATA%\QingquOCR\settings.json`; Windows DPAPI encrypts credentials in `credentials.bin` in the same directory. `QINGQU_DATA_DIR` selects a separate data directory. Keys can be shown or hidden in Settings; do not share credential files or screenshots containing keys.
 
-- Default data directory: `%LOCALAPPDATA%\QingquOCR`. Preferences are stored in `settings.json`; `credentials.bin` is encrypted with Windows DPAPI. `QINGQU_DATA_DIR` selects an independent directory.
-- The credential editor can show or hide saved keys. Do not commit credential files or screenshots containing keys.
-- OCR sends the selected image to the bound provider; translation sends text to its configured provider. With automatic translation enabled, recognized text is subsequently sent for translation.
-- Opening clipboard notes / images with `Alt+V` does not upload their content. Recognition and translation commands make requests according to your configuration.
-- Original images and undo records use session temporary files. Original-image files are removed after the final window/task reference is released.
-- Copying an image leaves a PNG in the system temporary directory `QingquOCR-clipboard` so its path survives application exit. Later successful copies remove files older than seven days and aim for a cache limit of 128 images / 128 MiB. Current or locked files may temporarily exceed those limits. Copied sensitive images can therefore remain after exit.
+<details>
+<summary><strong>Local images and temporary files</strong></summary>
+
+Original images and undo records use session temporary files. An original is removed after its final window/task reference is released. Copying an image leaves a PNG in the system temporary directory `QingquOCR-clipboard` so its path remains usable after exit. Later successful copies remove files older than seven days and aim for a cache limit of 128 images / 128 MiB. Current or locked files may temporarily exceed those limits. Copied sensitive images can therefore remain after exit.
+
+</details>
 
 ## Build from source
 
-### Prerequisites
-
-- Rust MSVC toolchain: `x86_64-pc-windows-msvc`. This version was checked with Rust 1.97.1; no minimum supported Rust version is declared.
-- Visual Studio C++ Build Tools and Windows SDK. A C++17 compiler is required for the statically linked Scintilla sources.
-- Network access for the first Cargo dependency fetch; offline builds are possible once dependencies are cached.
-- Python 3.11+ for optional ZIP packaging only, not for running the application.
+Requires **Rust MSVC, Visual Studio C++ Build Tools with C++17, and Windows SDK**. The current build uses Rust 1.97.1; no minimum supported Rust version is declared.
 
 In PowerShell with the MSVC development environment configured:
 
@@ -169,61 +135,46 @@ In PowerShell with the MSVC development environment configured:
 cargo build --release --locked
 ```
 
-Output: `target/release/qingqu-ocr-native.exe`. `.cargo/config.toml` enables static CRT for Windows MSVC. Required Scintilla sources are included in `vendor/scintilla`.
+Output: `target/release/qingqu-ocr-native.exe`. Required Scintilla sources are included in `vendor/scintilla` and linked statically. The first Cargo dependency fetch requires network access.
 
-Basic checks:
+<details>
+<summary><strong>Checks, packaging, and source layout</strong></summary>
 
 ```powershell
 cargo fmt --all -- --check
 cargo check --locked
 cargo clippy --locked -- -D warnings
-```
-
-Package the executable, READMEs, and notices:
-
-```powershell
 python scripts/package.py
 ```
 
-The script reads the current executable and locked Windows dependency metadata, then creates `dist/qingqu-ocr-native-0.3.0-windows-x64.zip` and a SHA-256 file. Development notes, test reports, and historical experimental executables are excluded.
+Packaging requires Python 3.11+; running the application does not. A Windows x64 ZIP and SHA-256 file are generated in `dist/`, containing the current executable, bilingual READMEs, screenshots, and applicable licenses.
 
-### Source layout
+| Path | Contents |
+|---|---|
+| `src/native/` | Win32 windows, Scintilla editor, settings, tables, and image UI |
+| `src/config/`, `src/ocr/`, `src/ocr_cloud/` | Task bindings, recognition settings, and service adapters |
+| `src/platform/`, `src/text/` | Capture, clipboard, text conversion, and formatting |
+| `assets/`, `vendor/` | Icons, themes, native components, and local rendering adapter |
+| `licenses/`, `docs/screenshots/` | Third-party notices and UI examples |
 
-```text
-src/                     Application, service adapters, and platform code
-  config/                Task bindings, recognition, and language settings
-  native/                Win32 windows, settings, editor, tables, and images
-  ocr/                   Input budgets, formula, and spreadsheet handling
-  platform/              Capture, clipboard, and local caches
-  text/                  Formatting, reading order, and paragraph rules
-assets/                  App icon, SVGs, themes, and manifest
-vendor/                  Scintilla, image adapter, and algorithm attribution
-licenses/                Third-party license texts and component inventory
-docs/screenshots/        Consistently sized UI examples
-scripts/package.py       Release packaging
-LICENSE                  Noncommercial license for original project materials
-NOTICE.txt               Copyright and license scope
-THIRD_PARTY_NOTICES.txt   Third-party component information
-```
+</details>
 
 ## Known limitations
 
-- Windows x64 only; no macOS / Linux build or bundled offline OCR engine.
-- The application UI is primarily Chinese. An English README does not imply a fully localized English interface.
-- Capture covers the monitor under the pointer and does not span multiple monitors. Captures exceeding 48 MiB of raw pixels are rejected.
-- Input dimensions and PNG byte budgets are enforced before upload. Large images may be reduced, affecting small text. Automatic tiled recognition with additional requests is not implemented.
-- Model availability, permissions, endpoint changes, and network conditions affect results. No fixed latency, free quota, or universal language accuracy is guaranteed.
-- Verify custom, Qwen, and compatible protocols with your own account. Client support does not mean every model has been validated against a live cloud account.
-- Touchpads, specific IMEs, mixed-DPI monitors, and complex formulas may behave differently across devices. Large-image frame rates and peak memory depend on CPU, viewport, and image dimensions.
+- Windows x64 only; the UI is primarily Chinese. No offline OCR model is bundled.
+- Capture covers the monitor under the pointer and does not span monitors. Captures exceeding 48 MiB of raw pixels are rejected.
+- Large inputs may be reduced to meet upload budgets, affecting small text. Automatic tiled recognition is not implemented.
+- Quality, latency, and model availability depend on the provider and network. Verify Qwen, custom models, and compatible protocols with your own account. Legacy Baidu formula endpoints and web translation paths may be affected by provider changes.
+- Complex formulas, specific IMEs, touchpads, and mixed-DPI monitors may behave differently across devices. `Unlimited-OCR-2` has legacy configuration fields only; recognition is not implemented.
 
-## Feedback
+## Feedback and contributions
 
-Include the Windows and application versions, DPI, provider/model, reproduction steps, and expected behavior when reporting an issue. Attach a minimal nonsensitive sample and relevant screenshots. Do not attach API keys, `credentials.bin`, or private source documents.
+Include Windows / application versions, DPI, provider/model, reproduction steps, and expected behavior when reporting an issue. Attach a minimal nonsensitive sample. Do not submit API keys, `credentials.bin`, or private source documents. Read project and third-party licenses before contributing and run the basic checks above.
 
 ## License
 
-Original code, documentation, and original artwork that the project author has authority to license are available under **[PolyForm Noncommercial License 1.0.0](LICENSE)**, for the purposes that license permits. **Commercial use of those original materials is not granted.** This is a source-available noncommercial project; it does not claim an unrestricted open-source license.
+Original code, documentation, and original artwork that the author has authority to license use **[PolyForm Noncommercial 1.0.0](LICENSE)**. **Commercial use of those materials is not granted.** Source availability is subject to that license's permitted purposes.
 
-Third-party components retain their own licenses. The project's noncommercial terms do not narrow rights granted by the original MIT, Apache-2.0, BSD, Unicode, Scintilla, or other applicable licenses. Umi-OCR / GapTree-derived layout portions retain their MIT attribution. Read [NOTICE.txt](NOTICE.txt), [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt), and [licenses/](licenses/), and preserve applicable copyright, license, and notice files when distributing.
+Third-party components retain their own licenses and the commercial-use rights those licenses grant. Project noncommercial terms do not replace third-party MIT, Apache-2.0, BSD, or other applicable licenses. Umi-OCR / GapTree-derived portions retain MIT attribution. Preserve applicable notices in [NOTICE.txt](NOTICE.txt), [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt), and [licenses/](licenses/) when distributing.
 
-Thanks to the maintainers of Scintilla, Umi-OCR / GapTree, fast_image_resize, Microsoft Fluent UI System Icons, VS Code, Catppuccin, and the Rust ecosystem.
+Thanks to the maintainers of Scintilla, Umi-OCR / GapTree, fast_image_resize, Fluent UI System Icons, VS Code, Catppuccin, and the Rust ecosystem.
