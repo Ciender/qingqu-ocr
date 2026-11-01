@@ -1434,7 +1434,7 @@ pub fn run() -> Result<(), String> {
         let work = platform::primary_work_size();
         let size = (820f32.min(work.0 - 20.), 360f32.min(work.1 - 30.));
         let hwnd = create(
-            "轻取 OCR · 原生版",
+            "轻取 OCR",
             size,
             Content::Main(Box::new(Main::new(settings, keys, warning))),
             None,

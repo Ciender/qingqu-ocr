@@ -282,7 +282,7 @@ impl Default for Settings {
             floating_button: true,
             picture_info: false,
             close_to_tray: true,
-            hotkey: "Ctrl + Shift + O".into(),
+            hotkey: "Alt+Q".into(),
             correct_orientation: false,
             dark: false,
             palette: "vscode".into(),
@@ -296,9 +296,8 @@ impl Default for Settings {
                 .map(|(action, _)| Binding {
                     action: (*action).into(),
                     key: match *action {
-                        "capture" => "Ctrl+Shift+O",
+                        "capture" => "Alt+Q",
                         "clipboard" => "Alt+V",
-                        "show" => "Ctrl+Shift+Q",
                         _ => "",
                     }
                     .into(),
