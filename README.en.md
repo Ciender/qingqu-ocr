@@ -2,7 +2,7 @@
   <img src="assets/app.svg" width="72" height="72" alt="Qingqu OCR icon">
 </p>
 
-<h1 align="center">Qingqu OCR · Win32 Native</h1>
+<h1 align="center">Qingqu OCR</h1>
 
 <p align="center">Capture text · Translate side by side · Format paragraphs · Pin images</p>
 
@@ -21,7 +21,7 @@
   <a href="#license">License</a>
 </p>
 
-Qingqu OCR is a Windows application for extracting and organizing text. This repository contains the **Rust + Win32 native rewrite**: capture screen content, edit and translate it, preview formulas, and copy tables in one workspace. Clipboard text and images can also become independent desktop notes and pinned windows.
+Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Capture screen content, edit and translate text, format paragraphs, preview formulas, and copy tables in one workspace. Clipboard text and images can also become independent desktop notes and pinned windows.
 
 Built with Scintilla, system Rich Edit, and GDI, the application runs directly after extraction. **OCR uses your configured cloud provider and requires network access and API permissions.** Original project materials are licensed for noncommercial purposes.
 
@@ -41,8 +41,6 @@ Built with Scintilla, system Rich Edit, and GDI, the application runs directly a
 
 ## Screenshots
 
-Actual application captures with illustrative content. All images use a **960 × 600** canvas and preserve window proportions; click to view full size. Some captures come from earlier native builds, so individual controls may differ from the current application.
-
 <table>
   <tr>
     <td align="center"><a href="docs/screenshots/workspace.png"><img src="docs/screenshots/workspace.png" width="320" alt="Two-pane source and result workspace"></a><br><strong>Two-pane workspace</strong></td>
@@ -54,50 +52,52 @@ Actual application captures with illustrative content. All images use a **960 ×
   </tr>
   <tr>
     <td align="center"><a href="docs/screenshots/dark-theme.png"><img src="docs/screenshots/dark-theme.png" width="320" alt="Formula preview in a dark theme"></a><br><strong>Dark theme</strong></td>
-    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="Independent clipboard note and pinned image"></a><br><strong>Notes and pinned images</strong></td>
+    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="Pinned image with a fine border, soft shadow, and native context menu"></a><br><strong>Pinned image and context menu</strong></td>
   </tr>
 </table>
 
 ## Getting started
 
-**Requirements: Windows 10 / 11, x64.** No separate Python, browser engine, editor DLL, or TeX installation is needed. Word / Excel is only required as a destination for editable tables.
-
-1. Extract `qingqu-ocr-native-0.3.0-windows-x64.zip` and run `qingqu-ocr-native.exe`. Fully exit the previous version from the tray before updating.
+1. Extract `qingqu-ocr-0.3.0-windows-x64.zip` and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
 2. Open **Settings → API services** (`设置 → API 服务`). Enter your provider credentials and the required region, model, or endpoint.
 3. Open **Settings → Task bindings** (`设置 → 调用配置`). Choose the task, service, and endpoint, then save and apply.
-4. Press **`Ctrl+Shift+O`**, click a preselected window or drag a region, and release to recognize. Edit, translate, format, or copy the result.
+4. Press **`Alt+Q`** to capture text, or **`Alt+V`** to open clipboard text / images.
 
 Image OCR can follow the text configuration or use its own binding. Cloud services may charge for requests; the application does not supply API keys. Available endpoints, languages, and account permissions depend on the provider.
 
 ### Supported services
 
-| Provider | Adapted tasks or capabilities |
-|---|---|
-| Baidu OCR | Text, tables, vertical text, formulas, and related document-analysis endpoints |
-| Tencent Cloud OCR | Text, table, and vertical-text endpoints |
-| Alibaba Cloud standalone OCR | General text, high-accuracy documents, tables, and formulas |
-| Alibaba Cloud unified OCR | Task-specific text, handwriting, multilingual, and table types |
-| Model Studio Qwen-OCR / Qwen-VL | Adapted text, table, vertical-text, and formula tasks using native or compatible protocols, depending on the model |
-| Mathpix | Formula recognition |
+<table>
+  <thead><tr><th>Category</th><th>Service</th><th>Capabilities</th></tr></thead>
+  <tbody>
+    <tr><th colspan="3" align="left">OCR recognition</th></tr>
+    <tr><td rowspan="6">OCR</td><td>Baidu OCR</td><td>Text, tables, vertical text, formulas, and document analysis</td></tr>
+    <tr><td>Tencent Cloud OCR</td><td>Text, tables, and vertical text</td></tr>
+    <tr><td>Alibaba Cloud standalone OCR</td><td>General text, high-accuracy documents, tables, and formulas</td></tr>
+    <tr><td>Alibaba Cloud unified OCR</td><td>Text, handwriting, multilingual text, and tables</td></tr>
+    <tr><td>Model Studio Qwen-OCR / Qwen-VL</td><td>Text, tables, vertical text, and formulas according to model capabilities</td></tr>
+    <tr><td>Mathpix</td><td>Formula recognition</td></tr>
+    <tr><th colspan="3" align="left">Text translation</th></tr>
+    <tr><td rowspan="7">Translation</td><td>Google</td><td>Web service / official API</td></tr>
+    <tr><td>Microsoft</td><td>Web service / official API</td></tr>
+    <tr><td>Index Translate</td><td>Separate endpoint, model, and key settings</td></tr>
+    <tr><td>OpenAI-compatible</td><td>Custom compatible endpoints, models, and streaming</td></tr>
+    <tr><td>Baidu Translate</td><td>Official translation API</td></tr>
+    <tr><td>Alibaba Cloud Translate</td><td>Official translation API</td></tr>
+    <tr><td>Tencent Translate</td><td>Official translation API</td></tr>
+  </tbody>
+</table>
 
-Translation has seven entries: **Google, Microsoft, Index Translate, OpenAI-compatible, Baidu, Alibaba Cloud, and Tencent**. Google / Microsoft offer web-service paths or adapted official APIs. Custom compatible services accept your endpoint, model, and key. OCR language and translation target language are configured separately; the client does not automatically switch to another paid service.
+Use the **“?” button** in the application for each service's endpoint, configuration, and quota information.
 
-Traditional Alibaba Cloud AccessKey credentials are configured separately from Model Studio API keys. Question-mark cards in Settings provide endpoint information and official links, not live account balances. Provider documentation governs model availability, permissions, prices, and quotas.
-
-### Shortcuts
+### Default shortcuts
 
 | Shortcut | Action |
 |---|---|
-| `Ctrl+Shift+O` | Capture a preselected window or region for OCR |
-| `Ctrl+Shift+Q` | Show the main window |
-| `Alt+V` | Open current clipboard text / image in an independent window |
-| `Ctrl+C` / `Ctrl+X` / `Ctrl+V` | Copy / cut / paste |
-| `Ctrl+Z` / `Ctrl+Y` | Undo / redo |
-| `Ctrl++` / `Ctrl+-` / `Ctrl+0` | Change font size / restore size 14 |
-| `Esc` | Minimize the main window, cancel capture, or close an image/secondary window |
-| Image wheel / right-click | Pointer-anchored zoom / image actions menu |
+| `Alt+Q` | Capture text from the screen |
+| `Alt+V` | Open current clipboard text / images |
 
-Global shortcuts are configurable. Closing the main window normally sends it to the tray; choose Exit from the tray to close the application completely.
+Assign shortcuts to other actions in Settings as needed.
 
 <details>
 <summary><strong>Formatting, tables, and image workflows</strong></summary>
@@ -144,10 +144,10 @@ Output: `target/release/qingqu-ocr-native.exe`. Required Scintilla sources are i
 cargo fmt --all -- --check
 cargo check --locked
 cargo clippy --locked -- -D warnings
-python scripts/package.py
+pwsh -File scripts/package.ps1
 ```
 
-Packaging requires Python 3.11+; running the application does not. A Windows x64 ZIP and SHA-256 file are generated in `dist/`, containing the current executable, bilingual READMEs, screenshots, and applicable licenses.
+Package the release with PowerShell. A Windows x64 ZIP and SHA-256 file are generated in `dist/`, containing the current executable, bilingual READMEs, screenshots, and applicable licenses.
 
 | Path | Contents |
 |---|---|
@@ -158,14 +158,6 @@ Packaging requires Python 3.11+; running the application does not. A Windows x64
 | `licenses/`, `docs/screenshots/` | Third-party notices and UI examples |
 
 </details>
-
-## Known limitations
-
-- Windows x64 only; the UI is primarily Chinese. No offline OCR model is bundled.
-- Capture covers the monitor under the pointer and does not span monitors. Captures exceeding 48 MiB of raw pixels are rejected.
-- Large inputs may be reduced to meet upload budgets, affecting small text. Automatic tiled recognition is not implemented.
-- Quality, latency, and model availability depend on the provider and network. Verify Qwen, custom models, and compatible protocols with your own account. Legacy Baidu formula endpoints and web translation paths may be affected by provider changes.
-- Complex formulas, specific IMEs, touchpads, and mixed-DPI monitors may behave differently across devices. `Unlimited-OCR-2` has legacy configuration fields only; recognition is not implemented.
 
 ## Feedback and contributions
 

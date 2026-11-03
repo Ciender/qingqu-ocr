@@ -2,7 +2,7 @@
   <img src="assets/app.svg" width="72" height="72" alt="轻取 OCR 图标">
 </p>
 
-<h1 align="center">轻取 OCR · Win32 原生版</h1>
+<h1 align="center">轻取 OCR</h1>
 
 <p align="center">截图取字 · 双栏翻译 · 智能排版 · 图片悬浮</p>
 
@@ -21,7 +21,7 @@
   <a href="#许可证">许可证</a>
 </p>
 
-轻取 OCR 是一款 Windows 桌面文字识别与整理工具。本仓库提供 **Rust + Win32 原生重构版**：从屏幕提取文字，在同一工作区完成编辑、翻译、公式预览和表格复制，也可以将剪贴板内容固定为桌面便签或图片浮窗。
+轻取 OCR 是一款使用 **Rust + Win32** 开发的 Windows 桌面文字识别工具：从屏幕提取文字，在同一工作区完成编辑、翻译、排版、公式预览和表格复制，也可以将剪贴板内容固定为桌面便签或图片浮窗。
 
 应用使用 Scintilla、系统 Rich Edit 和 GDI，解压即可运行。**OCR 通过你配置的云服务完成，需要网络及对应 API 权限。** 原创代码采用非商业许可。
 
@@ -41,8 +41,6 @@
 
 ## 界面预览
 
-实际程序截图，使用示例内容展示功能。图片统一为 **960 × 600**，保留窗口比例；点击可查看原图。部分截图来自此前的原生版本，当前控件细节以程序为准。
-
 <table>
   <tr>
     <td align="center"><a href="docs/screenshots/workspace.png"><img src="docs/screenshots/workspace.png" width="320" alt="原文与结果双栏工作区"></a><br><strong>双栏工作区</strong></td>
@@ -54,50 +52,52 @@
   </tr>
   <tr>
     <td align="center"><a href="docs/screenshots/dark-theme.png"><img src="docs/screenshots/dark-theme.png" width="320" alt="深色主题下的公式预览"></a><br><strong>深色主题</strong></td>
-    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="独立文字便签与图片浮窗"></a><br><strong>便签与图片浮窗</strong></td>
+    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="图片浮窗的细描边、柔和阴影与右键功能菜单"></a><br><strong>图片浮窗与右键菜单</strong></td>
   </tr>
 </table>
 
 ## 开始使用
 
-**系统要求：Windows 10 / 11，x64。** 应用不需要额外安装 Python、浏览器内核、编辑器 DLL 或 TeX；Word / Excel 仅用于接收复制出的可编辑表格。
-
-1. 解压 `qingqu-ocr-native-0.3.0-windows-x64.zip`，运行 `qingqu-ocr-native.exe`。更新前先从托盘彻底退出旧版。
+1. 解压 `qingqu-ocr-0.3.0-windows-x64.zip`，运行 `qingqu-ocr.exe`。更新前先从托盘彻底退出旧版。
 2. 打开 **设置 → API 服务**，填写你要使用的服务凭据，以及所需的地域、模型或地址。
 3. 打开 **设置 → 调用配置**，按“功能 → API 服务 → 具体接口”选择各任务的绑定，保存并应用。
-4. 按 **`Ctrl+Shift+O`**，单击预选窗口或拖动框选，松开后识别。随后可编辑、翻译、排版或复制结果。
+4. 按 **`Alt+Q`** 截图识别，或按 **`Alt+V`** 打开剪贴板文字 / 图片。
 
 图片识别可以跟随文字配置，也可以独立设置。云服务可能收费，程序不提供 API Key；可用接口、语言及账户权限由服务商决定。
 
 ### 支持的服务
 
-| 服务 | 已适配的任务或能力 |
-|---|---|
-| 百度 OCR | 文字、表格、竖排、公式及相关文档分析接口 |
-| 腾讯云 OCR | 文字、表格及竖排相关接口 |
-| 阿里云 OCR 独立接口 | 通用文字、高精度文档、表格和公式等接口 |
-| 阿里云 OCR 统一识别 | 按任务绑定文字、手写、多语言或表格等类型 |
-| 百炼 Qwen-OCR / Qwen-VL | 按模型能力适配文字、表格、竖排和公式，支持原生或兼容协议 |
-| Mathpix | 公式识别 |
+<table>
+  <thead><tr><th>类别</th><th>服务</th><th>支持内容</th></tr></thead>
+  <tbody>
+    <tr><th colspan="3" align="left">OCR 识别</th></tr>
+    <tr><td rowspan="6">OCR</td><td>百度 OCR</td><td>文字、表格、竖排、公式及文档分析</td></tr>
+    <tr><td>腾讯云 OCR</td><td>文字、表格、竖排</td></tr>
+    <tr><td>阿里云 OCR 独立接口</td><td>通用文字、高精度文档、表格、公式</td></tr>
+    <tr><td>阿里云 OCR 统一识别</td><td>文字、手写、多语言、表格</td></tr>
+    <tr><td>百炼 Qwen-OCR / Qwen-VL</td><td>按模型能力提供文字、表格、竖排与公式识别</td></tr>
+    <tr><td>Mathpix</td><td>公式识别</td></tr>
+    <tr><th colspan="3" align="left">文字翻译</th></tr>
+    <tr><td rowspan="7">翻译</td><td>Google</td><td>网页服务 / 官方 API</td></tr>
+    <tr><td>Microsoft</td><td>网页服务 / 官方 API</td></tr>
+    <tr><td>Index Translate</td><td>独立地址、模型与密钥配置</td></tr>
+    <tr><td>OpenAI 兼容</td><td>自定义兼容地址、模型及流式输出</td></tr>
+    <tr><td>百度翻译</td><td>官方翻译 API</td></tr>
+    <tr><td>阿里云翻译</td><td>官方翻译 API</td></tr>
+    <tr><td>腾讯翻译</td><td>官方翻译 API</td></tr>
+  </tbody>
+</table>
 
-翻译提供 **Google、Microsoft、Index Translate、OpenAI 兼容、百度、阿里云、腾讯** 七个入口。Google / Microsoft 可选择网页服务或已适配的官方 API；自定义兼容服务可填写地址、模型和密钥。文字识别语言与翻译目标语言分别设置，程序不会自动切换到其他付费服务。
+各服务的接口、配置和额度说明，可点击软件中的 **“？”按钮** 查看。
 
-阿里云传统 AccessKey 与百炼 API Key 分别配置。设置中的问号卡片提供接口说明和官方链接，不查询账户余额；模型、权限、价格和额度以服务商为准。
-
-### 常用快捷键
+### 默认快捷键
 
 | 快捷键 | 操作 |
 |---|---|
-| `Ctrl+Shift+O` | 截图识别：预选窗口或框选区域 |
-| `Ctrl+Shift+Q` | 显示主窗口 |
-| `Alt+V` | 将当前剪贴板文字 / 图片打开为独立窗口 |
-| `Ctrl+C` / `Ctrl+X` / `Ctrl+V` | 复制 / 剪切 / 粘贴 |
-| `Ctrl+Z` / `Ctrl+Y` | 撤销 / 重做 |
-| `Ctrl++` / `Ctrl+-` / `Ctrl+0` | 调整字号 / 恢复 14 号 |
-| `Esc` | 主窗最小化；取消截图；关闭图片或子窗口 |
-| 图片滚轮 / 右键 | 指针中心缩放 / 打开图片操作菜单 |
+| `Alt+Q` | 截图识别 |
+| `Alt+V` | 打开当前剪贴板文字 / 图片 |
 
-全局热键可在设置中修改。关闭主窗口默认收进托盘；托盘“退出”会彻底关闭程序。
+其他功能可在设置中按需分配快捷键。
 
 <details>
 <summary><strong>排版、表格和图片的使用说明</strong></summary>
@@ -144,10 +144,10 @@ cargo build --release --locked
 cargo fmt --all -- --check
 cargo check --locked
 cargo clippy --locked -- -D warnings
-python scripts/package.py
+pwsh -File scripts/package.ps1
 ```
 
-打包需要 Python 3.11+，运行应用不需要 Python。`dist/` 中生成 Windows x64 ZIP 及 SHA-256 校验文件，包含当前 EXE、双语 README、示范图与适用的许可证。
+使用 PowerShell 打包。`dist/` 中生成 Windows x64 ZIP 及 SHA-256 校验文件，包含当前 EXE、双语 README、示范图与适用的许可证。
 
 | 路径 | 内容 |
 |---|---|
@@ -158,14 +158,6 @@ python scripts/package.py
 | `licenses/`、`docs/screenshots/` | 第三方声明与界面示范 |
 
 </details>
-
-## 已知限制
-
-- 当前支持 Windows x64，界面以中文为主；不包含离线 OCR 模型。
-- 截图只覆盖鼠标所在显示器，不跨屏框选；原始像素超过 48 MiB 时提示超限。
-- 大图可能按上传预算缩小，密集小字可能受影响；尚未实现自动分块识别。
-- 识别质量、延迟及可用模型取决于服务与网络。Qwen、自定义模型和兼容协议需要用自己的账户验证；旧百度公式接口及网页翻译入口可能受服务方变更影响。
-- 复杂公式、特定输入法、触控板和混合 DPI 多屏可能存在设备差异。`Unlimited-OCR-2` 仅保留历史配置字段，尚未接入识别。
 
 ## 反馈与贡献
 
