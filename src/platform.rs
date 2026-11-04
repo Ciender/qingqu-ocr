@@ -685,17 +685,30 @@ pub fn capture_desktop() -> Result<(RgbaImage, i32, i32), String> {
             .map(|image| (image, x, y))
     }
 }
-unsafe fn capture_rect(x: i32, y: i32, w: i32, h: i32) -> Result<RgbaImage, String> {
-    const MAX_CAPTURE_BYTES: u64 = 48 * 1024 * 1024;
-    let bytes = (w as u64).saturating_mul(h as u64).saturating_mul(4);
-    if w <= 0 || h <= 0 || bytes > MAX_CAPTURE_BYTES {
-        return Err("鼠标所在显示器超过截图内存预算，请降低显示分辨率后重试。".into());
+fn capture_pixels(w: i32, h: i32) -> Result<Vec<u8>, String> {
+    if w <= 0 || h <= 0 {
+        return Err("截图区域无效。".into());
     }
+    let bytes = (w as usize)
+        .checked_mul(h as usize)
+        .and_then(|pixels| pixels.checked_mul(4))
+        .filter(|&bytes| bytes <= isize::MAX as usize)
+        .ok_or("截图尺寸超出系统支持的内存范围。")?;
+    // Keep the monitor's physical resolution. Allocation failure, rather than
+    // an arbitrary pixel budget, decides whether the capture can proceed.
     let mut pixels = Vec::new();
-    pixels
-        .try_reserve_exact(bytes as usize)
-        .map_err(|_| "无法申请截图像素缓冲。")?;
-    pixels.resize(bytes as usize, 0u8);
+    pixels.try_reserve_exact(bytes).map_err(|_| {
+        format!(
+            "可用内存不足，无法创建 {:.1} MiB 的截图缓冲。",
+            bytes as f64 / (1024. * 1024.)
+        )
+    })?;
+    pixels.resize(bytes, 0u8);
+    Ok(pixels)
+}
+
+unsafe fn capture_rect(x: i32, y: i32, w: i32, h: i32) -> Result<RgbaImage, String> {
+    let pixels = capture_pixels(w, h)?;
     let screen = GetDC(null_mut());
     let dc = CreateCompatibleDC(screen);
     let bitmap = CreateCompatibleBitmap(screen, w, h);
