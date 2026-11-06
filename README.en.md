@@ -23,21 +23,16 @@
 
 Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Capture screen content, edit and translate text, format paragraphs, preview formulas, and copy tables in one workspace. Clipboard text and images can also become independent desktop notes and pinned windows.
 
-Built with Scintilla, system Rich Edit, and GDI, the application runs directly after extraction. **OCR uses your configured cloud provider and requires network access and API permissions.** Original project materials are licensed for noncommercial purposes.
+**OCR uses your configured cloud provider and requires network access and API permissions.** Original project materials are licensed for noncommercial purposes.
 
 ## Features
 
-| Feature | Capabilities |
-|---|---|
-| Screen OCR | Freeze the current monitor, preselect a window or drag a region; recognize text, tables, vertical text, and formulas |
-| Translation | Side-by-side source and translation, manual or automatic requests, target-language switching, and streaming for compatible APIs |
-| Text editing | Line numbers, wrapping, search, selections, font controls, and separate source/translation undo and redo |
-| Formatting | Automatic paragraphs, original OCR lines, merged paragraphs, smart cleanup, punctuation conversion, Simplified/Traditional Chinese, indentation, and paragraph spacing |
-| Formulas and Markdown | Edit source on the left and preview natively on the right; copying preserves LaTeX / Markdown source |
-| Tables | Multiple tables, empty cells, merged spans, captions, and footnotes; copy into Word / Excel for further editing |
-| Notes and images | `Alt+V` opens the current clipboard content; images support zoom, rotation, dragging, pinning, information bars, and independent OCR |
-| Task routing | Independent service and endpoint bindings for text, tables, vertical text, formulas, translation, and images |
-| Desktop integration | Tray, global shortcuts, floating toolbar, startup option, single instance, and light/dark VS Code Modern / Catppuccin palettes |
+- **Screen OCR:** text, tables, vertical text, and formulas.
+- **Translation:** two panes, multiple providers, automatic and streaming output.
+- **Text tools:** editing, search, paragraphs, formatting, and Chinese/punctuation conversion.
+- **Documents:** formula / Markdown previews and editable table copying to Word / Excel.
+- **Clipboard windows:** text notes, pinned images, and independent OCR.
+- **Desktop integration:** tray, shortcuts, floating toolbar, and light/dark themes.
 
 ## Screenshots
 
@@ -52,7 +47,7 @@ Built with Scintilla, system Rich Edit, and GDI, the application runs directly a
   </tr>
   <tr>
     <td align="center"><a href="docs/screenshots/dark-theme.png"><img src="docs/screenshots/dark-theme.png" width="320" alt="Formula preview in a dark theme"></a><br><strong>Dark theme</strong></td>
-    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="Pinned image with a fine border, soft shadow, and native context menu"></a><br><strong>Pinned image and context menu</strong></td>
+    <td align="center"><a href="docs/screenshots/clipboard-windows.png"><img src="docs/screenshots/clipboard-windows.png" width="320" alt="Clipboard text note, pinned image, and image context menu"></a><br><strong>Text notes and pinned images</strong></td>
   </tr>
 </table>
 
@@ -125,36 +120,93 @@ Original images and undo records use session temporary files. An original is rem
 
 </details>
 
+## Lightweight design
+
+The current Release build, measured on this machine with an idle two-pane workspace and floating toolbar on an isolated desktop and no cloud requests, used about **33.3 MiB working set**, **5.0 MiB private working set**, and **6.5 MiB private commit**. Two three-second CPU samples both read **0.0%**, normalized to one logical core. Working set includes shared system pages; images and recognition create additional temporary peaks. The application does not trim its working set.
+
+- **Use system UI infrastructure.** Statically linked Scintilla handles text editing, system Rich Edit handles formulas and documents, and Win32 / GDI draws the UI. Previews are created on demand, without a resident browser or GPU rendering context.
+- **Share originals and bound display caches.** Identical images share immutable file-backed storage while each window retains its own scale and rotation. Originals are mapped on demand, stationary display caches share a global **4 MiB** budget, and resources are released after the last window/task reference ends.
+- **Limit rendering to visible work.** SIMD convolution and bounded tiles reuse canvas and filter buffers. Continuous zoom coalesces input around a stable sampling anchor; animation timers and temporary buffers are released when interaction stops.
+- **Control concurrency and idle work.** Local processing, OCR, and translation use three fixed worker channels. Idle network clients release connections while valid authentication tokens remain reusable. Windows messages drive the UI instead of idle polling.
+- **Optimize size and hot paths separately.** Release builds use size optimization, Thin LTO, one codegen unit, and symbol stripping; image convolution and its adapter receive separate speed optimization.
+
 ## Build from source
 
-Requires **Rust MSVC, Visual Studio C++ Build Tools with C++17, and Windows SDK**. The current build uses Rust 1.97.1; no minimum supported Rust version is declared.
+### Requirements
 
-In PowerShell with the MSVC development environment configured:
+| Item | Requirement |
+|---|---|
+| Rust / Cargo | **1.97.1 or newer stable**; both the application and local renderer declare `rust-version = "1.97.1"` |
+| Target | `x86_64-pc-windows-msvc`, Rust 2021 Edition |
+| C++ toolchain | Visual Studio 2022 Build Tools or newer, with Desktop development with C++, MSVC x64/x86 tools, and C++17 support |
+| Windows SDK | Windows 10 / 11 SDK; the current build uses **10.0.26100.0** |
+| Release packaging | PowerShell **7.0+**; compiling the executable needs no additional packaging tool |
+
+Rust 1.97.1 is the currently declared and verified minimum supported version. See the [official rustup MSVC instructions](https://rust-lang.github.io/rustup/installation/windows-msvc.html) for installing the native toolchain.
+
+### Install the toolchain and fetch dependencies
+
+Install [rustup](https://rustup.rs/) and the C++ tools above, then run these commands from the repository root:
 
 ```powershell
-cargo build --release --locked
+rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal --component rustfmt --component clippy
+rustc +stable-x86_64-pc-windows-msvc --version
+cargo +stable-x86_64-pc-windows-msvc fetch --locked --target x86_64-pc-windows-msvc
 ```
 
-Output: `target/release/qingqu-ocr-native.exe`. Required Scintilla sources are included in `vendor/scintilla` and linked statically. The first Cargo dependency fetch requires network access.
+Confirm that Rust is at least 1.97.1. The first fetch needs network access. [Cargo.lock](Cargo.lock) fixes the dependency versions, while [Cargo.toml](Cargo.toml) declares runtime and build dependencies. Cargo installs the Rust libraries automatically.
 
-<details>
-<summary><strong>Checks, packaging, and source layout</strong></summary>
+### Compile and run
+
+Use **Developer PowerShell for Visual Studio**, or PowerShell with the MSVC environment configured:
 
 ```powershell
-cargo fmt --all -- --check
-cargo check --locked
-cargo clippy --locked -- -D warnings
+cargo +stable-x86_64-pc-windows-msvc build --release --locked
+.\target\release\qingqu-ocr-native.exe
+```
+
+The build produces `target/release/qingqu-ocr-native.exe`, distributed as `qingqu-ocr.exe`. `.cargo/config.toml` enables static CRT, and a C++17 compiler builds Scintilla into the executable. Once dependencies are cached, add `--offline` to build without network access.
+
+### Checks and packaging
+
+```powershell
+cargo +stable-x86_64-pc-windows-msvc fmt --all -- --check
+cargo +stable-x86_64-pc-windows-msvc check --locked
+cargo +stable-x86_64-pc-windows-msvc clippy --locked -- -D warnings
 pwsh -File scripts/package.ps1
 ```
 
-Package the release with PowerShell. A Windows x64 ZIP and SHA-256 file are generated in `dist/`, containing the current executable, bilingual READMEs, screenshots, and applicable licenses.
+The packager reads the compiled executable and locked dependencies, verifies third-party notices, and creates a Windows x64 ZIP and SHA-256 file in `dist/`. The package includes the executable, bilingual READMEs, screenshots, and licenses. Existing ZIPs are not overwritten.
+
+<details>
+<summary><strong>Dependencies and source layout</strong></summary>
+
+Cargo retrieves registry libraries. The following local materials are already included:
+
+- `vendor/scintilla/`: Scintilla 5.6.9 core, headers, and Win32 sources.
+- `vendor/picture-renderer/`: the project's Rust image-rendering adapter.
+- `vendor/text-layout/`: attribution and licenses for adapted algorithms; their Rust implementation is in `src/text/`.
+- `assets/`: SVGs, themes, application icons, and Windows manifest used by the build.
+
+Key dependencies and purposes, using versions from the current lockfile:
+
+| Purpose | Dependencies |
+|---|---|
+| Windows interfaces | `windows 0.62.2`, `windows-sys 0.61.2` |
+| Images and clipboard | `image 0.25.10`, `fast_image_resize 6.1.0`, `arboard 3.7.0` |
+| Network and async requests | `reqwest 0.13.5`, `tokio 1.54.1`, `async-openai 0.42.3` |
+| Document parsing | `pulldown-cmark 0.13.6`, `quick-xml 0.41.0` |
+| Formatting and conversion | `ferrous-opencc 0.4.0`, `regex 1.13.1`, `textwrap 0.16.4`, `unicode-segmentation 1.13.3` |
+| Configuration and data | `serde 1.0.229`, `serde_json 1.0.154`, `secrecy 0.10.3`, `base64 0.22.1`, `md5 0.8.1`, `futures-util 0.3.34` |
+| Build resources | `cc 1.10.0`, `resvg 0.49.0`, `winresource 0.1.34` |
+
+Use `cargo tree --locked` to inspect all transitive dependencies. Registry crate sources are not all copied into this repository; Cargo lock metadata and `licenses/` retain version, origin, and license information.
 
 | Path | Contents |
 |---|---|
-| `src/native/` | Win32 windows, Scintilla editor, settings, tables, and image UI |
-| `src/config/`, `src/ocr/`, `src/ocr_cloud/` | Task bindings, recognition settings, and service adapters |
-| `src/platform/`, `src/text/` | Capture, clipboard, text conversion, and formatting |
-| `assets/`, `vendor/` | Icons, themes, native components, and local rendering adapter |
+| `src/native/` | Main window, notes, images, settings, and editor |
+| `src/config/`, `src/ocr/`, `src/ocr_cloud/` | Task configuration and recognition adapters |
+| `src/platform/`, `src/text/` | Capture, clipboard, formatting, and conversion |
 | `licenses/`, `docs/screenshots/` | Third-party notices and UI examples |
 
 </details>
