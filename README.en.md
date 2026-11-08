@@ -53,7 +53,7 @@ Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Captu
 
 ## Getting started
 
-1. Extract `qingqu-ocr-0.3.0-windows-x64.zip` and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
+1. [Download the Windows x64 package from Releases](https://github.com/Ciender/qingqu-ocr/releases/latest), extract `qingqu-ocr-0.3.0-windows-x64.zip`, and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
 2. Open **Settings → API services** (`设置 → API 服务`). Enter your provider credentials and the required region, model, or endpoint.
 3. Open **Settings → Task bindings** (`设置 → 调用配置`). Choose the task, service, and endpoint, then save and apply.
 4. Press **`Alt+Q`** to capture text, or **`Alt+V`** to open clipboard text / images.
