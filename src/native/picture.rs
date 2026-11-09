@@ -651,28 +651,13 @@ impl Picture {
         }
     }
     fn prepare_canvas(&mut self, h: &Host, mut visible: RECT) {
-        unsafe {
-            let mut monitor = MONITORINFO {
-                cbSize: size_of::<MONITORINFO>() as u32,
-                ..Default::default()
-            };
-            if GetMonitorInfoW(
-                MonitorFromRect(&visible, MONITOR_DEFAULTTONEAREST),
-                &mut monitor,
-            ) != 0
-            {
-                let (w, height) = (visible.right - visible.left, visible.bottom - visible.top);
-                let (left, top) = safe_position(
-                    visible.left,
-                    visible.top,
-                    w,
-                    height,
-                    &monitor.rcWork,
-                    h.px(24.),
-                );
-                visible = rect(left, top, w, height);
-            }
-        }
+        let (left, top) = pin_position::safe_position(&visible, &pin_position::monitor_areas());
+        visible = rect(
+            left,
+            top,
+            visible.right - visible.left,
+            visible.bottom - visible.top,
+        );
         // Reserve a screen-aligned grid of pixels, independent of the image's
         // moving origin. Grow only when the image leaves that reservation.
         let mut padded = visible;
@@ -735,19 +720,8 @@ impl Picture {
         unsafe {
             let old_viewport = visible_dimensions(h.hwnd);
             let proposed = rect(left, top, width, height);
-            let mut monitor = MONITORINFO {
-                cbSize: size_of::<MONITORINFO>() as u32,
-                ..Default::default()
-            };
-            let (left, top) = if GetMonitorInfoW(
-                MonitorFromRect(&proposed, MONITOR_DEFAULTTONEAREST),
-                &mut monitor,
-            ) != 0
-            {
-                safe_position(left, top, width, height, &monitor.rcWork, h.px(24.))
-            } else {
-                (left, top)
-            };
+            let (left, top) =
+                pin_position::safe_position(&proposed, &pin_position::monitor_areas());
             let frame = repaint
                 .then(|| {
                     self.render(h, width - PICTURE_FRAME * 2, height - PICTURE_FRAME * 2)
@@ -818,6 +792,36 @@ impl Picture {
             }
             presented
         }
+    }
+    pub fn reset_position(&mut self, h: &Host, area: &RECT, index: usize) {
+        self.stop_motion(h);
+        self.drag = None;
+        unsafe {
+            if GetCapture() == h.hwnd {
+                ReleaseCapture();
+            }
+            let bounds = visible_bounds(h.hwnd);
+            let r = pin_position::reset_bounds(&bounds, area, index);
+            self.resize_at(h, r.left, r.top, r.right - r.left, r.bottom - r.top, true);
+        }
+        self.update_scroll(h);
+    }
+    pub fn dpi_changed(&mut self, h: &mut Host, dpi: u32) {
+        self.stop_motion(h);
+        let old_footer = self.info_height(h);
+        h.change_dpi(dpi);
+        unsafe {
+            let bounds = visible_bounds(h.hwnd);
+            self.resize_at(
+                h,
+                bounds.left,
+                bounds.top,
+                bounds.right - bounds.left,
+                bounds.bottom - bounds.top + self.info_height(h) - old_footer,
+                true,
+            );
+        }
+        self.layout(h);
     }
     pub fn mouse(&mut self, h: &Host, msg: u32, l: isize) {
         unsafe {
@@ -1205,29 +1209,6 @@ fn zoom_axis(
     (
         scroll,
         ((viewport - scaled) / 2).max(0) as f32 - scroll as f32,
-    )
-}
-
-fn safe_position(
-    left: i32,
-    top: i32,
-    width: i32,
-    height: i32,
-    work: &RECT,
-    minimum: i32,
-) -> (i32, i32) {
-    // Keep at least 5% along each axis (24 DIP for small pins) reachable.
-    let visible_w = ((width + 19) / 20)
-        .max(minimum)
-        .min(width)
-        .min(work.right - work.left);
-    let visible_h = ((height + 19) / 20)
-        .max(minimum)
-        .min(height)
-        .min(work.bottom - work.top);
-    (
-        left.clamp(work.left + visible_w - width, work.right - visible_w),
-        top.clamp(work.top + visible_h - height, work.bottom - visible_h),
     )
 }
 

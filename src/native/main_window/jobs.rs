@@ -82,6 +82,7 @@ impl Main {
                 show_main(h.hwnd);
             },
             "settings" => self.open_settings(h),
+            "reset-pins" => self.reset_pins(h),
             "clipboard" => self.begin(
                 h,
                 Work::Clipboard,

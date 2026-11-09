@@ -389,6 +389,7 @@ unsafe extern "system" fn event_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM)
             for (id, label) in [
                 (1, "显示主窗口"),
                 (2, "当前剪贴板"),
+                (6, "Alt+V 全部剪贴板复位"),
                 (3, "区域截图"),
                 (5, "设置"),
                 (4, "退出"),
@@ -414,6 +415,7 @@ unsafe extern "system" fn event_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM)
                 3 => Some(Event::Action("capture".into())),
                 4 => Some(Event::Quit),
                 5 => Some(Event::Action("settings".into())),
+                6 => Some(Event::Action("reset-pins".into())),
                 _ => None,
             };
             if let Some(event) = event {

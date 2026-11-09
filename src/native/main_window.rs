@@ -633,6 +633,25 @@ impl Main {
         self.children.push(hwnd as usize);
         Ok(hwnd)
     }
+    fn reset_pins(&mut self, h: &mut Host) {
+        unsafe {
+            let mut cursor = POINT::default();
+            GetCursorPos(&mut cursor);
+            let monitor = MonitorFromPoint(cursor, MONITOR_DEFAULTTONEAREST);
+            let mut count = 0;
+            for &child in &self.children {
+                let child = child as HWND;
+                if matches!(
+                    GetPropW(child, platform::wide("QingquRole").as_ptr()) as usize,
+                    2 | 3
+                ) && PostMessageW(child, RESET_PIN, count, monitor as LPARAM) != 0
+                {
+                    count += 1;
+                }
+            }
+            self.set_status(h, format!("已复位 {count} 个 Alt+V 剪贴板窗口。"));
+        }
+    }
     fn set_picture_info(&mut self, h: &mut Host, visible: bool) {
         self.settings.picture_info = visible;
         if let Err(error) = config::save_preferences(&self.settings) {

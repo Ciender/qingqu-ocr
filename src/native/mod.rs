@@ -10,6 +10,7 @@ mod paragraph_menu;
 mod picture;
 mod picture_shadow;
 mod picture_zoom;
+mod pin_position;
 mod rendered;
 mod scintilla;
 mod service_help;
@@ -79,6 +80,8 @@ pub const AUTO_PARAGRAPH: u16 = 132;
 pub const AUTO_TRANSLATE: u16 = 133;
 pub const PICTURE_ZOOM: u32 = WM_APP + 22;
 pub const PICTURE_INFO: u32 = WM_APP + 23;
+pub const RESET_PIN: u32 = WM_APP + 24;
+const PICTURE_DPI: u32 = WM_APP + 25;
 
 pub enum Content {
     Main(Box<Main>),
@@ -726,6 +729,13 @@ unsafe extern "system" fn window_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM
         // Also runs while content is borrowed during drag, zoom and hide/show.
         picture_shadow::sync(hwnd);
     }
+    if msg == WM_DPICHANGED && GetPropW(hwnd, platform::wide("QingquRole").as_ptr()) as usize == 3 {
+        // A cross-monitor move delivers this synchronously while Picture is
+        // borrowed. Copy the DPI, not the temporary suggested-RECT pointer.
+        // Pins use image pixels and custom dragging; keep their screen origin.
+        PostMessageW(hwnd, PICTURE_DPI, w & 65535, 0);
+        return 0;
+    }
     // These messages also arrive reentrantly while content is borrowed. Never
     // let DefWindowProc restore the native recessed frame on that path.
     if msg == WM_NCACTIVATE {
@@ -892,6 +902,14 @@ unsafe extern "system" fn window_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM
             host.layout_title();
             content.layout(host);
             host.invalidate();
+            return 0;
+        }
+        PICTURE_DPI => {
+            if let Content::Picture(s) = content {
+                if host.dpi != w as u32 {
+                    s.dpi_changed(host, w as u32);
+                }
+            }
             return 0;
         }
         WM_DPICHANGED => {
@@ -1219,6 +1237,39 @@ unsafe extern "system" fn window_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM
         PICTURE_INFO => {
             if let Content::Picture(s) = content {
                 s.show_info(host, w != 0);
+            }
+            return 0;
+        }
+        RESET_PIN => {
+            if matches!(content, Content::Picture(_) | Content::Note(_)) {
+                let mut monitor = MONITORINFO {
+                    cbSize: size_of::<MONITORINFO>() as u32,
+                    ..Default::default()
+                };
+                if GetMonitorInfoW(l as HMONITOR, &mut monitor) != 0 {
+                    if IsIconic(hwnd) != 0 {
+                        ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+                    }
+                    if let Content::Picture(s) = content {
+                        s.reset_position(host, &monitor.rcWork, w);
+                    } else {
+                        let mut bounds = RECT::default();
+                        GetWindowRect(hwnd, &mut bounds);
+                        let r = pin_position::reset_bounds(&bounds, &monitor.rcWork, w);
+                        SetWindowPos(
+                            hwnd,
+                            null_mut(),
+                            r.left,
+                            r.top,
+                            r.right - r.left,
+                            r.bottom - r.top,
+                            SWP_NOZORDER | SWP_NOACTIVATE,
+                        );
+                        content.layout(host);
+                    }
+                    ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+                    host.invalidate();
+                }
             }
             return 0;
         }
