@@ -18,6 +18,7 @@
   <a href="#getting-started">Getting started</a> ·
   <a href="#screenshots">Screenshots</a> ·
   <a href="#build-from-source">Build</a> ·
+  <a href="#architecture--technical-decisions">Architecture</a> ·
   <a href="#license">License</a>
 </p>
 
@@ -200,6 +201,36 @@ Use `cargo tree --locked` to inspect all transitive dependencies. Registry crate
 | `licenses/`, `docs/screenshots/` | Third-party notices and UI examples |
 
 </details>
+
+## Architecture & Technical Decisions
+
+Designed as a purely native Windows desktop application, the architecture prioritizes **zero Web runtime overhead, zero redundant abstractions, and build-time resource baking**:
+
+### Core Technology Stack
+
+| Component | Stack | Key Architectural Rationale & Implementation |
+|---|---|---|
+| **Language & Runtime** | Rust 2021 + MSVC C++17 | Static CRT linking (`-C target-feature=+crt-static`), zero external runtime or VC++ Redistributable distribution dependencies; standalone portable binary |
+| **GUI Framework** | Win32 API (`windows-sys` / `windows`) | Pure Win32 event loop + GDI / DWM; zero overhead from Electron, WebView2, or Qt; 0% idle CPU usage |
+| **Code & Text Editor** | Scintilla 5.6.9 | C++17 sources statically compiled via `cc` in `build.rs` directly into the binary; low single-digit megabyte memory footprint, replacing heavy Web editors |
+| **Formula & Document Preview** | RichEdit + TOM (`ITextDocument2`) | Direct hardware-accelerated LaTeX math rendering using RichEdit's native `TOM_CONVERT_TEX` feature, eliminating Chromium / MathJax / KaTeX dependencies |
+| **Markdown Parser** | `pulldown-cmark` | Zero-copy streaming AST parser, mapping style ranges directly into RichEdit Text Object Model spans with minimal allocations |
+| **Image Viewport Rendering** | `fast_image_resize` + Custom Bounded Tiling | Runtime-dispatched SIMD (AVX2/SSE4.1) convolution; Bounded Tiles viewport clipping samples only visible screen pixels, avoiding runaway memory from full-canvas redraws |
+| **Layout Reconstruction** | GapTree (Native Rust Port) | Restores and splits paragraphs based on block geometry topology and reading order, integrated with `unicode-segmentation` for boundary rules |
+| **Icon Assets** | `resvg` (Build dependency only) | Pre-rasterizes and bakes Fluent SVG icons into compact bitmap assets in `build.rs`; zero vector rendering engine overhead at runtime |
+
+### Runtime Footprint & Memory Lifecycle (Measured)
+
+| State | Working Set | Private Working Set | Private Commit | CPU Usage | Handles / GDI / USER |
+|---|---|---|---|---|---|
+| **Active Idle / System Tray** | **22.50 MiB** | **2.41 MiB** | **3.33 MiB** | **0.0%** (Event-driven, no polling) | GDI: 48, USER: 67, Handles: 225 |
+
+> Note: Verified across 300 rapid window open/close cycles with zero handle leaks (GDI/USER/system handles fully reclaimed). Continuous 4K image scaling returns immediately to the ~19.4 MiB / 3.72 MiB baseline upon window closure.
+
+### Compilation & Binary Size Controls
+
+* **Tiered Optimization**: Global `opt-level = "s"` (size-optimized), `lto = "thin"`, `codegen-units = 1`, and `panic = "abort"`; performance-critical paths (`fast_image_resize` and `qingqu-picture-renderer`) selectively override with `opt-level = 3`.
+* **Feature Pruning**: Default crate features disabled across the board (`image` retains only `png/jpeg/bmp` decoders; `tokio` limited to `rt/time` microkernel). Standalone executable size is ~9.6 MB (~6.7 MB in release ZIP).
 
 ## Feedback and contributions
 

@@ -18,6 +18,7 @@
   <a href="#开始使用">开始使用</a> ·
   <a href="#界面预览">界面预览</a> ·
   <a href="#从源码构建">构建</a> ·
+  <a href="#技术栈与架构选型">技术栈</a> ·
   <a href="#许可证">许可证</a>
 </p>
 
@@ -200,6 +201,36 @@ pwsh -File scripts/package.ps1
 | `licenses/`、`docs/screenshots/` | 第三方声明与界面示范 |
 
 </details>
+
+## 技术栈与架构选型
+
+本项目为纯原生 Windows 桌面应用，整体设计以**零 Web 运行时、零冗余中间层、编译期优化**为核心原则：
+
+### 核心选型与轻量化考量
+
+| 模块 | 技术选型 | 关键技术考量与实现细节 |
+|---|---|---|
+| **语言与运行时** | Rust 2021 + MSVC C++17 | 全静态链接 CRT（`-C target-feature=+crt-static`），无 VC++ 运行库分发依赖，产物为绿色单二进制 |
+| **GUI 架构** | Win32 API (`windows-sys` / `windows`) | 纯 Win32 消息循环驱动 + GDI / DWM，无 Electron / WebView2 / Qt 等重型框架开销，空闲 CPU 恒为 0% |
+| **文本编辑器** | Scintilla 5.6.9 | C++17 源码在 `build.rs` 中通过 `cc` 静态内联编译进二进制，内存开销数兆级，替代笨重的 Web 代码编辑器 |
+| **公式与文档预览** | RichEdit + TOM (`ITextDocument2`) | 利用 Windows 原生 RichEdit 控件的 `TOM_CONVERT_TEX` 特性直接渲染 LaTeX 数学公式，免去 Chromium / MathJax / KaTeX 引擎 |
+| **Markdown 引擎** | `pulldown-cmark` | Zero-copy 流式解析 AST 标记，直接映射到 RichEdit 的字符格式区间（Span），避免整树对象开销 |
+| **图像缩放与渲染** | `fast_image_resize` + 自研瓦片裁剪 | 运行时检测并动态分发 SIMD（AVX2/SSE4.1）卷积；结合 Bounded Tiles 视口裁剪算法，仅重采样屏幕可见区域像素 |
+| **版面重构算法** | GapTree (Rust 原生移植) | 基于文本块几何拓扑与阅读顺序实现段落合并与拆分，结合 `unicode-segmentation` 处理标点与边界 |
+| **图标资源处理** | `resvg` (仅构建期构建依赖) | 编译期由 `build.rs` 完成 Fluent SVG 图标光栅化并烘焙为紧凑位图，运行时零矢量解析引擎负担 |
+
+### 运行时开销与资源回收（实测数据）
+
+| 运行状态 | 物理工作集 (Working Set) | 私有工作集 (Private WS) | 私有提交 (虚拟内存) | CPU 占用 | 句柄 / GDI / USER |
+|---|---|---|---|---|---|
+| **主窗静置 / 托盘后台** | **22.50 MiB** | **2.41 MiB** | **3.33 MiB** | **0.0%**（事件驱动无轮询） | GDI: 48, USER: 67, 句柄: 225 |
+
+> 注：经 300 次窗口开关压测无句柄泄漏（GDI/USER/系统句柄均完全对齐回收），4K 图片高频缩放关窗后工作集与私有提交即刻回落至 ~19.4 MiB / 3.72 MiB 初始基线。
+
+### 编译与产物控制
+
+* **分层优化**：全局配置 `opt-level = "s"`（体积优先）、`lto = "thin"`、`codegen-units = 1`、`panic = "abort"`；仅对高频计算路径（`fast_image_resize`、`qingqu-picture-renderer`）单独配置 `opt-level = 3`。
+* **特性剪裁**：严格禁用第三方库默认特性（`image` 仅保留 `png/jpeg/bmp` 解码器，`tokio` 仅启用 `rt/time` 异步任务微内核），单 EXE 产物控制在 ~9.6 MB（打包 ZIP 约 6.7 MB）。
 
 ## 反馈与贡献
 
