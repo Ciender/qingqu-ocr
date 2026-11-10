@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4" alt="Windows 10 / 11 x64">
-  <img src="https://img.shields.io/badge/version-0.3.0-2563EB" alt="版本 0.3.0">
+  <img src="https://img.shields.io/badge/version-0.3.1-2563EB" alt="版本 0.3.1">
   <img src="https://img.shields.io/badge/Rust-Win32-DEA584" alt="Rust + Win32">
   <img src="https://img.shields.io/badge/license-Noncommercial-64748B" alt="非商业许可">
 </p>
@@ -33,7 +33,7 @@
 - **文本整理**：编辑、查找、分段、排版、简繁与标点转换。
 - **文档处理**：公式 / Markdown 预览，表格复制到 Word / Excel。
 - **剪贴板窗口**：文字便签、图片浮窗、独立 OCR。
-- **桌面集成**：托盘、热键、悬浮条与浅深主题。
+- **桌面集成**：开机自启、桌面／开始菜单快捷方式、托盘、热键、悬浮条与浅深主题。
 
 ## 界面预览
 
@@ -54,12 +54,21 @@
 
 ## 开始使用
 
-1. 从 [Releases 下载 Windows x64 发布包](https://github.com/Ciender/qingqu-ocr/releases/latest)，解压 `qingqu-ocr-0.3.0-windows-x64.zip`，运行 `qingqu-ocr.exe`。更新前先从托盘彻底退出旧版。
+1. 从 [Releases 下载 Windows x64 发布包](https://github.com/Ciender/qingqu-ocr/releases/latest)，解压 `qingqu-ocr-0.3.1-windows-x64.zip`，运行 `qingqu-ocr.exe`。更新前先从托盘彻底退出旧版。
 2. 打开 **设置 → API 服务**，填写你要使用的服务凭据，以及所需的地域、模型或地址。
 3. 打开 **设置 → 调用配置**，按“功能 → API 服务 → 具体接口”选择各任务的绑定，保存并应用。
 4. 按 **`Alt+Q`** 截图识别，或按 **`Alt+V`** 打开剪贴板文字 / 图片。
 
 图片识别可以跟随文字配置，也可以独立设置。云服务可能收费，程序不提供 API Key；可用接口、语言及账户权限由服务商决定。
+
+### 0.3.1 更新
+
+- 修复主窗口原文／译文栏输入中文时临时拼音反复追加的问题；确认后的文字作为一步撤销，撤销／重做不会恢复临时拼音。
+- 右键托盘图标可开启／关闭“开机自启”，登录 Windows 后驻留托盘。
+- 托盘“发送到桌面快捷方式”“发送到开始菜单”为当前 EXE 创建快捷方式，重复点击更新同一个链接。
+- 托盘“显示工具悬浮窗”“关闭工具悬浮窗”和工具条自己的 X 均会保存显示状态，下次启动沿用。
+
+请先将 EXE 放到固定文件夹，再启用自启或创建快捷方式。移动／更换 EXE 路径后，重新创建快捷方式，并在设置中保存一次已开启的自启选项，以更新路径。程序沿用已有配置，更新无需删除设置或密钥。
 
 ### 支持的服务
 

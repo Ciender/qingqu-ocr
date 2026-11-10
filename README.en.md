@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4" alt="Windows 10 / 11 x64">
-  <img src="https://img.shields.io/badge/version-0.3.0-2563EB" alt="Version 0.3.0">
+  <img src="https://img.shields.io/badge/version-0.3.1-2563EB" alt="Version 0.3.1">
   <img src="https://img.shields.io/badge/Rust-Win32-DEA584" alt="Rust + Win32">
   <img src="https://img.shields.io/badge/license-Noncommercial-64748B" alt="Noncommercial license">
 </p>
@@ -33,7 +33,7 @@ Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Captu
 - **Text tools:** editing, search, paragraphs, formatting, and Chinese/punctuation conversion.
 - **Documents:** formula / Markdown previews and editable table copying to Word / Excel.
 - **Clipboard windows:** text notes, pinned images, and independent OCR.
-- **Desktop integration:** tray, shortcuts, floating toolbar, and light/dark themes.
+- **Desktop integration:** launch at sign-in, desktop / Start menu shortcuts, tray, hotkeys, floating toolbar, and light/dark themes.
 
 ## Screenshots
 
@@ -54,12 +54,21 @@ Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Captu
 
 ## Getting started
 
-1. [Download the Windows x64 package from Releases](https://github.com/Ciender/qingqu-ocr/releases/latest), extract `qingqu-ocr-0.3.0-windows-x64.zip`, and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
+1. [Download the Windows x64 package from Releases](https://github.com/Ciender/qingqu-ocr/releases/latest), extract `qingqu-ocr-0.3.1-windows-x64.zip`, and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
 2. Open **Settings → API services** (`设置 → API 服务`). Enter your provider credentials and the required region, model, or endpoint.
 3. Open **Settings → Task bindings** (`设置 → 调用配置`). Choose the task, service, and endpoint, then save and apply.
 4. Press **`Alt+Q`** to capture text, or **`Alt+V`** to open clipboard text / images.
 
 Image OCR can follow the text configuration or use its own binding. Cloud services may charge for requests; the application does not supply API keys. Available endpoints, languages, and account permissions depend on the provider.
+
+### Changes in 0.3.1
+
+- Fix repeated Chinese IME preedit text in the source / translation editors. Confirmed text is one undo step; undo / redo never restores temporary pinyin.
+- Enable or disable launch at Windows sign-in from the tray menu; startup keeps the app in the tray.
+- Create desktop and Start menu shortcuts for the current executable from the tray. Repeating the command updates the same link.
+- Show or close the floating toolbar from the tray. Its own close button also saves the visibility preference for the next launch.
+
+Move the executable to a permanent folder before enabling startup or creating shortcuts. After changing its path, recreate the shortcuts and save the enabled startup option in Settings to update its target. Existing settings and credentials carry over to this version.
 
 ### Supported services
 

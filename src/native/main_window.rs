@@ -252,6 +252,7 @@ impl Main {
                     message: WAKE,
                 },
                 bindings,
+                self.settings.floating_button,
             ) {
                 Ok((desktop, rx)) => {
                     if !desktop.has_tray {
@@ -267,7 +268,9 @@ impl Main {
             }
             DragAcceptFiles(h.hwnd, 1);
             if self.settings.floating_button {
-                self.make_toolbar(h);
+                if let Err(error) = self.sync_toolbar(h) {
+                    self.set_status(h, error);
+                }
             }
             h.min_size.0 = if self.settings.show_translation {
                 600.
@@ -286,9 +289,6 @@ impl Main {
                     h.px(360.),
                     SWP_NOZORDER | SWP_NOACTIVATE,
                 );
-            }
-            if std::env::args().any(|s| s == "--tray") {
-                ShowWindow(h.hwnd, SW_HIDE);
             }
         }
         self.load_document_argument(h)?;
@@ -551,21 +551,91 @@ impl Main {
         h.title = self.status.clone();
         h.invalidate();
     }
-    fn make_toolbar(&mut self, h: &mut Host) {
-        if self.toolbar != 0 && unsafe { IsWindow(self.toolbar as HWND) } != 0 {
-            return;
-        }
-        if let Ok(window) = create(
-            "轻取悬浮工具条",
-            (198., 34.),
-            Content::Toolbar,
-            h.proxy.clone(),
-            &self.settings.palette,
-            self.settings.dark,
-            h.font_size,
-        ) {
+    fn sync_toolbar(&mut self, h: &mut Host) -> Result<(), String> {
+        let visible = self.settings.floating_button;
+        if visible && (self.toolbar == 0 || unsafe { IsWindow(self.toolbar as HWND) } == 0) {
+            let window = create(
+                "轻取悬浮工具条",
+                (198., 34.),
+                Content::Toolbar,
+                h.proxy.clone(),
+                &self.settings.palette,
+                self.settings.dark,
+                h.font_size,
+            )?;
             self.toolbar = window as usize;
             self.children.push(window as usize);
+        }
+        if self.toolbar != 0 {
+            unsafe {
+                ShowWindow(
+                    self.toolbar as HWND,
+                    if visible { SW_SHOWNOACTIVATE } else { SW_HIDE },
+                );
+            }
+        }
+        if let Some(desktop) = &self.desktop {
+            desktop.toolbar_visible(visible);
+        }
+        Ok(())
+    }
+    fn sync_desktop_option(&self, command: u16, enabled: bool) {
+        unsafe {
+            if self.settings_hwnd != 0 && IsWindow(self.settings_hwnd as HWND) != 0 {
+                PostMessageW(
+                    self.settings_hwnd as HWND,
+                    COMMAND,
+                    command as usize | (usize::from(enabled) << 16),
+                    0,
+                );
+            }
+        }
+    }
+    fn set_toolbar_visible(&mut self, h: &mut Host, visible: bool) {
+        let previous = self.settings.floating_button;
+        self.settings.floating_button = visible;
+        if let Err(error) = self.sync_toolbar(h) {
+            self.settings.floating_button = previous;
+            self.set_status(h, error);
+            return;
+        }
+        self.sync_desktop_option(settings::SYNC_TOOLBAR, visible);
+        match config::save_preferences(&self.settings) {
+            Ok(()) => self.set_status(
+                h,
+                if visible {
+                    "已显示工具悬浮窗。"
+                } else {
+                    "已关闭工具悬浮窗。"
+                },
+            ),
+            Err(error) => self.set_status(h, error),
+        }
+    }
+    fn toggle_startup(&mut self, h: &mut Host) {
+        let enabled = !platform::startup_enabled();
+        if let Err(error) = platform::set_startup(enabled) {
+            self.set_status(h, error);
+            return;
+        }
+        self.settings.startup = enabled;
+        self.sync_desktop_option(settings::SYNC_STARTUP, enabled);
+        match config::save_preferences(&self.settings) {
+            Ok(()) => self.set_status(
+                h,
+                if enabled {
+                    "已开启开机自启，下次登录后自动驻留托盘。"
+                } else {
+                    "已关闭开机自启。"
+                },
+            ),
+            Err(error) => self.set_status(h, error),
+        }
+    }
+    fn create_shortcut(&mut self, h: &mut Host, target: platform::Shortcut) {
+        match platform::create_shortcut(target) {
+            Ok(path) => self.set_status(h, format!("已创建快捷方式：{}", path.display())),
+            Err(error) => self.set_status(h, error),
         }
     }
     pub fn open_settings(&mut self, h: &mut Host) {
@@ -575,6 +645,7 @@ impl Main {
                 return;
             }
         }
+        self.settings.startup = platform::startup_enabled();
         let work = platform::primary_work_size();
         let state = SettingsEditor::new(self.settings.clone(), self.keys.clone());
         match create(
@@ -834,7 +905,7 @@ impl Main {
                 let bindings = settings.hotkeys.clone();
                 d.rebind(bindings)?;
             }
-            if settings.startup != platform::startup_enabled() {
+            if settings.startup || platform::startup_enabled() {
                 platform::set_startup(settings.startup)?;
             }
             config::save(&settings, &keys)
@@ -881,12 +952,8 @@ impl Main {
         self.toggle_translation(h, visible);
         h.set_font_size(self.settings.editor_font_size);
         self.apply_theme(h);
-        if self.settings.floating_button {
-            self.make_toolbar(h);
-        } else if self.toolbar != 0 {
-            unsafe {
-                PostMessageW(self.toolbar as HWND, WM_CLOSE, 0, 0);
-            }
+        if let Err(error) = self.sync_toolbar(h) {
+            self.set_status(h, error);
         }
         if self.settings_hwnd != 0 {
             unsafe {
@@ -922,6 +989,9 @@ impl Main {
         }
     }
 
+    pub(super) fn has_tray(&self) -> bool {
+        self.desktop.as_ref().is_some_and(|d| d.has_tray)
+    }
     pub fn close(&mut self, h: &mut Host) -> bool {
         if !self.exiting
             && self.settings.close_to_tray

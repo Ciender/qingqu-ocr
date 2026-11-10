@@ -78,6 +78,11 @@ pub const MARKDOWN_PREVIEW: u16 = 130;
 pub const PARAGRAPH: u16 = 131;
 pub const AUTO_PARAGRAPH: u16 = 132;
 pub const AUTO_TRANSLATE: u16 = 133;
+pub const SHOW_TOOLBAR: u16 = 423;
+pub const HIDE_TOOLBAR: u16 = 425;
+pub const STARTUP: u16 = 426;
+pub const DESKTOP_SHORTCUT: u16 = 427;
+pub const START_MENU_SHORTCUT: u16 = 428;
 pub const PICTURE_ZOOM: u32 = WM_APP + 22;
 pub const PICTURE_INFO: u32 = WM_APP + 23;
 pub const RESET_PIN: u32 = WM_APP + 24;
@@ -212,6 +217,12 @@ impl Content {
                     p.send(Notice::Record(false));
                 }
                 true
+            }
+            Self::Toolbar => {
+                if let Some(p) = &h.proxy {
+                    p.action("hide-toolbar");
+                }
+                false
             }
             _ => true,
         }
@@ -626,9 +637,14 @@ pub fn create(
         } else if role == 1 {
             place_beside(hwnd, null_mut());
         }
+        let tray_launch = role == 1
+            && std::env::args().any(|s| s == "--tray")
+            && matches!(&window.borrow().content, Content::Main(s) if s.has_tray());
         ShowWindow(
             hwnd,
-            if role == 9 {
+            if tray_launch {
+                SW_HIDE
+            } else if role == 9 {
                 SW_SHOWNOACTIVATE
             } else {
                 SW_SHOW

@@ -1,9 +1,11 @@
 //! Windows integration runs on a message loop, with no idle polling.
 mod clipboard_cache;
 mod image_clipboard;
+mod integration;
 mod table_clipboard;
 use crate::config::Binding;
 use image::RgbaImage;
+pub use integration::{create_shortcut, set_startup, startup_enabled, Shortcut};
 use std::{
     ptr::{null, null_mut},
     sync::mpsc,
@@ -14,7 +16,6 @@ use windows_sys::Win32::{
     Graphics::Gdi::*,
     System::{
         LibraryLoader::GetModuleHandleW,
-        Registry::*,
         Threading::{CreateMutexW, GetCurrentProcessId},
     },
     UI::{HiDpi::*, Input::KeyboardAndMouse::*, Shell::*, WindowsAndMessaging::*},
@@ -102,6 +103,7 @@ pub enum Event {
 enum Command {
     Rebind(Vec<Binding>, mpsc::SyncSender<Result<(), String>>),
     Pause(bool, mpsc::SyncSender<Result<(), String>>),
+    ToolbarVisible(bool),
 }
 pub struct Desktop {
     hwnd: usize,
@@ -118,6 +120,7 @@ struct State {
     paused: bool,
     tray: NOTIFYICONDATAW,
     taskbar_created: u32,
+    toolbar_visible: bool,
 }
 impl State {
     fn emit(&self, event: Event) {
@@ -145,6 +148,7 @@ impl Desktop {
     pub fn start(
         ctx: Notify,
         bindings: Vec<Binding>,
+        toolbar_visible: bool,
     ) -> Result<(Self, mpsc::Receiver<Event>), String> {
         let (tx, rx) = mpsc::channel();
         let (cmd_tx, cmd_rx) = mpsc::channel();
@@ -197,6 +201,7 @@ impl Desktop {
                 paused: false,
                 tray,
                 taskbar_created: RegisterWindowMessageW(wide("TaskbarCreated").as_ptr()),
+                toolbar_visible,
             });
             let ptr = Box::into_raw(state);
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, ptr as isize);
@@ -253,6 +258,13 @@ impl Desktop {
         }
         rx.recv()
             .map_err(|_| "快捷键状态更新没有完成。".to_string())?
+    }
+    pub fn toolbar_visible(&self, visible: bool) {
+        if self.commands.send(Command::ToolbarVisible(visible)).is_ok() {
+            unsafe {
+                PostMessageW(self.hwnd as HWND, WM_APP + 1, 0, 0);
+            }
+        }
     }
 }
 impl Drop for Desktop {
@@ -391,10 +403,29 @@ unsafe extern "system" fn event_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM)
                 (2, "当前剪贴板"),
                 (6, "Alt+V 全部剪贴板复位"),
                 (3, "区域截图"),
+                (0, ""),
+                (10, "显示工具悬浮窗(&F)"),
+                (11, "关闭工具悬浮窗(&H)"),
+                (0, ""),
+                (7, "开机自启(&S)"),
+                (8, "发送到桌面快捷方式(&D)"),
+                (9, "发送到开始菜单(&W)"),
+                (0, ""),
                 (5, "设置"),
                 (4, "退出"),
             ] {
-                AppendMenuW(menu, MF_STRING, id, wide(label).as_ptr());
+                let flags = if id == 0 {
+                    MF_SEPARATOR
+                } else if (id == 10 && (*ptr).toolbar_visible)
+                    || (id == 11 && !(*ptr).toolbar_visible)
+                {
+                    MF_STRING | MF_GRAYED
+                } else if id == 7 && startup_enabled() {
+                    MF_STRING | MF_CHECKED
+                } else {
+                    MF_STRING
+                };
+                AppendMenuW(menu, flags, id, wide(label).as_ptr());
             }
             let mut point = POINT::default();
             GetCursorPos(&mut point);
@@ -416,6 +447,11 @@ unsafe extern "system" fn event_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM)
                 4 => Some(Event::Quit),
                 5 => Some(Event::Action("settings".into())),
                 6 => Some(Event::Action("reset-pins".into())),
+                7 => Some(Event::Action("toggle-startup".into())),
+                8 => Some(Event::Action("desktop-shortcut".into())),
+                9 => Some(Event::Action("start-menu-shortcut".into())),
+                10 => Some(Event::Action("show-toolbar".into())),
+                11 => Some(Event::Action("hide-toolbar".into())),
                 _ => None,
             };
             if let Some(event) = event {
@@ -442,6 +478,7 @@ unsafe extern "system" fn event_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM)
             x if x == WM_APP + 1 => {
                 while let Ok(command) = state.rx.try_recv() {
                     match command {
+                        Command::ToolbarVisible(visible) => state.toolbar_visible = visible,
                         Command::Rebind(bindings, reply) => {
                             let result = rebind(hwnd, state, bindings, false);
                             let _ = reply.send(result);
@@ -545,76 +582,6 @@ pub fn copy_image_pixels(
 }
 pub fn copy_table(xml: &[u8], tsv: &str, rtf: &[u8]) -> Result<(), String> {
     table_clipboard::copy(xml, tsv, rtf)
-}
-pub fn startup_enabled() -> bool {
-    unsafe {
-        let mut h = null_mut();
-        if RegOpenKeyExW(
-            HKEY_CURRENT_USER,
-            wide("Software\\Microsoft\\Windows\\CurrentVersion\\Run").as_ptr(),
-            0,
-            KEY_QUERY_VALUE,
-            &mut h,
-        ) != 0
-        {
-            return false;
-        }
-        let result = RegQueryValueExW(
-            h,
-            wide("QingquOCR").as_ptr(),
-            null(),
-            null_mut(),
-            null_mut(),
-            null_mut(),
-        ) == 0;
-        RegCloseKey(h);
-        result
-    }
-}
-pub fn set_startup(enabled: bool) -> Result<(), String> {
-    unsafe {
-        let mut h = null_mut();
-        if RegCreateKeyExW(
-            HKEY_CURRENT_USER,
-            wide("Software\\Microsoft\\Windows\\CurrentVersion\\Run").as_ptr(),
-            0,
-            null(),
-            0,
-            KEY_SET_VALUE,
-            null(),
-            &mut h,
-            null_mut(),
-        ) != 0
-        {
-            return Err("无法修改当前用户开机启动设置。".into());
-        }
-        let name = wide("QingquOCR");
-        let code = if enabled {
-            let exe = std::env::current_exe().map_err(|_| "无法定位程序文件。")?;
-            let data = wide(&format!("\"{}\" --tray", exe.display()));
-            RegSetValueExW(
-                h,
-                name.as_ptr(),
-                0,
-                REG_SZ,
-                data.as_ptr().cast(),
-                (data.len() * 2) as u32,
-            )
-        } else {
-            let code = RegDeleteValueW(h, name.as_ptr());
-            if code == ERROR_FILE_NOT_FOUND {
-                0
-            } else {
-                code
-            }
-        };
-        RegCloseKey(h);
-        if code == 0 {
-            Ok(())
-        } else {
-            Err("更新开机启动失败。".into())
-        }
-    }
 }
 pub fn hide_owned_windows() -> Vec<usize> {
     unsafe {

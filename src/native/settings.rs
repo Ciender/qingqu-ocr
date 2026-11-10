@@ -8,6 +8,8 @@ use serde_json::{json, Value};
 use std::time::{Duration, Instant};
 
 pub(super) const SAVED: u16 = 505;
+pub(super) const SYNC_STARTUP: u16 = 506;
+pub(super) const SYNC_TOOLBAR: u16 = 507;
 
 #[derive(Clone)]
 enum Input {
@@ -396,9 +398,9 @@ impl SettingsEditor {
             3 => {
                 self.add(h, "启动时", "", Input::Heading, false);
                 for (label, path) in [
-                    ("当前用户开机启动", "/startup"),
+                    ("开机自启（登录后驻留托盘）", "/startup"),
                     ("关闭主窗到托盘", "/close_to_tray"),
-                    ("显示悬浮工具条", "/floating_button"),
+                    ("显示工具悬浮窗", "/floating_button"),
                     ("主窗口默认置顶", "/default_topmost"),
                 ] {
                     self.add(h, label, path, Input::Check, false);
@@ -650,7 +652,21 @@ impl SettingsEditor {
     }
     pub fn command(&mut self, h: &mut Host, id: u16, code: u16) {
         unsafe {
-            if (930..932).contains(&id) {
+            if matches!(id, SYNC_STARTUP | SYNC_TOOLBAR) {
+                // Tray changes take effect immediately, including in an already-open draft.
+                let path = if id == SYNC_STARTUP {
+                    "/startup"
+                } else {
+                    "/floating_button"
+                };
+                let enabled = code != 0;
+                *self.draft.pointer_mut(path).unwrap() = json!(enabled);
+                for field in &self.fields {
+                    if field.path == path {
+                        SendMessageW(field.edit, BM_SETCHECK, usize::from(enabled), 0);
+                    }
+                }
+            } else if (930..932).contains(&id) {
                 if let Some(link) = self.reference_actions.get((id - 930) as usize) {
                     reference::open_reference(h, link.url);
                 }

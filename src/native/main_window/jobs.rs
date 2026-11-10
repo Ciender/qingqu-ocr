@@ -92,14 +92,11 @@ impl Main {
             ),
             "translate" => self.command(h, TRANSLATE, 0, null_mut()),
             "format" => self.command(h, FORMAT, 0, null_mut()),
-            "hide-toolbar" => {
-                if self.toolbar != 0 {
-                    unsafe {
-                        PostMessageW(self.toolbar as HWND, WM_CLOSE, 0, 0);
-                    }
-                }
-                self.settings.floating_button = false;
-            }
+            "show-toolbar" => self.set_toolbar_visible(h, true),
+            "hide-toolbar" => self.set_toolbar_visible(h, false),
+            "toggle-startup" => self.toggle_startup(h),
+            "desktop-shortcut" => self.create_shortcut(h, platform::Shortcut::Desktop),
+            "start-menu-shortcut" => self.create_shortcut(h, platform::Shortcut::StartMenu),
             "capture" | "window" | "fullscreen" | "table" | "vertical" | "formula" => {
                 let mode = match action {
                     "table" => "表格",

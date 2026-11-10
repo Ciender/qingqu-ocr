@@ -8,6 +8,10 @@ use std::{
 
 const NONE: u64 = u64::MAX;
 const HEADER: u64 = 80;
+struct Composition {
+    before: Range,
+    native_undo: Option<usize>,
+}
 struct Journal {
     file: File,
     cursor: u64,
@@ -16,6 +20,7 @@ struct Journal {
     pasted: bool,
     paragraph_source: u64,
     group: Option<(String, Range, bool, u64)>,
+    composition: Option<Composition>,
 }
 impl Journal {
     fn new(current: String) -> io::Result<Self> {
@@ -27,6 +32,7 @@ impl Journal {
             pasted: false,
             paragraph_source: NONE,
             group: None,
+            composition: None,
         })
     }
     fn record(
@@ -212,7 +218,8 @@ pub unsafe fn install(hwnd: HWND) -> Result<(), String> {
         return Err("无法启用会话撤销历史。".into());
     }
     SetPropW(hwnd, crate::platform::wide(PROP).as_ptr(), ptr.cast());
-    // This journal owns history; don't retain a second Rich Edit undo buffer.
+    // This journal owns history. Scintilla's inline IME temporarily needs its
+    // native undo collection to replace preedit text; proc enables it below.
     SendMessageW(hwnd, SETUNDOLIMIT, 0, 0);
     Ok(())
 }
@@ -293,6 +300,73 @@ unsafe extern "system" fn proc(
     let Ok(mut state) = cell.try_borrow_mut() else {
         return DefSubclassProc(hwnd, msg, w, l);
     };
+    // control_proc routes keydown; suppress the corresponding control character too.
+    if msg == WM_CHAR && matches!(w, 25 | 26) {
+        return 0;
+    }
+    let user_change = matches!(
+        msg,
+        WM_CHAR
+            | WM_KEYDOWN
+            | WM_CUT
+            | WM_PASTE
+            | super::scintilla::api::SCI_PASTE
+            | WM_CLEAR
+            | WM_IME_COMPOSITION
+            | WM_IME_ENDCOMPOSITION
+            | WM_UNICHAR
+    );
+    if matches!(msg, WM_IME_STARTCOMPOSITION | WM_IME_COMPOSITION) && state.composition.is_none() {
+        let before = selection(hwnd);
+        if state.end_group(before).is_err() {
+            report(hwnd);
+        }
+        let native_undo = if super::scintilla::is_editor(hwnd) {
+            use super::scintilla::api::*;
+            let enabled = SendMessageW(hwnd, SCI_GETUNDOCOLLECTION, 0, 0) as usize;
+            if enabled == 0 {
+                SendMessageW(hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+                SendMessageW(hwnd, SCI_SETUNDOCOLLECTION, 1, 0);
+            }
+            Some(enabled)
+        } else {
+            None
+        };
+        state.composition = Some(Composition {
+            before,
+            native_undo,
+        });
+    }
+    if state.composition.is_some() && (user_change || msg == WM_IME_STARTCOMPOSITION) {
+        // Preedit updates are temporary, not session history entries. Release
+        // the borrow so an IME can synchronously end composition inside a key
+        // message (for example when focus changes).
+        drop(state);
+        let result = DefSubclassProc(hwnd, msg, w, l);
+        if msg == WM_IME_ENDCOMPOSITION {
+            let mut state = cell.borrow_mut();
+            if let Some(composition) = state.composition.take() {
+                // Let Scintilla remove the final tentative text before freeing
+                // its IME undo buffer. Outside composition, history stays on disk.
+                if composition.native_undo == Some(0) {
+                    use super::scintilla::api::*;
+                    SendMessageW(hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+                    SendMessageW(hwnd, SCI_SETUNDOCOLLECTION, 0, 0);
+                }
+                let next = text(hwnd);
+                let pasted = super::scintilla::pasted_document(hwnd);
+                // A canceled composition must also retain paragraph provenance.
+                if (next != state.current || pasted != state.pasted)
+                    && state
+                        .record(next, composition.before, selection(hwnd), pasted)
+                        .is_err()
+                {
+                    report(hwnd);
+                }
+            }
+        }
+        return result;
+    }
     if msg == EM_CANUNDO {
         return (state.cursor != NONE || state.group.is_some()) as isize;
     }
@@ -318,22 +392,6 @@ unsafe extern "system" fn proc(
             }
         };
     }
-    // control_proc routes keydown; suppress the corresponding control character too.
-    if msg == WM_CHAR && matches!(w, 25 | 26) {
-        return 0;
-    }
-    let user_change = matches!(
-        msg,
-        WM_CHAR
-            | WM_KEYDOWN
-            | WM_CUT
-            | WM_PASTE
-            | super::scintilla::api::SCI_PASTE
-            | WM_CLEAR
-            | 0x010f
-            | 0x010e
-            | 0x0109
-    );
     let mutation = user_change || matches!(msg, WM_SETTEXT | EM_REPLACESEL);
     if !mutation {
         drop(state);

@@ -601,10 +601,11 @@ impl Main {
                     .into();
                     self.apply_theme(h);
                 }
-                423 => {
-                    self.make_toolbar(h);
-                    self.settings.floating_button = true;
-                }
+                SHOW_TOOLBAR => self.set_toolbar_visible(h, true),
+                HIDE_TOOLBAR => self.set_toolbar_visible(h, false),
+                STARTUP => self.toggle_startup(h),
+                DESKTOP_SHORTCUT => self.create_shortcut(h, platform::Shortcut::Desktop),
+                START_MENU_SHORTCUT => self.create_shortcut(h, platform::Shortcut::StartMenu),
                 424 => {
                     PostMessageW(h.hwnd, EXIT, 0, 0);
                 }
@@ -692,7 +693,11 @@ impl Main {
                     (NOTE, "原文打开便签"),
                     (421, "切换浅色 / 深色"),
                     (422, "切换配色系列"),
-                    (423, "显示悬浮工具条"),
+                    (SHOW_TOOLBAR, "显示工具悬浮窗"),
+                    (HIDE_TOOLBAR, "关闭工具悬浮窗"),
+                    (STARTUP, "开启 / 关闭开机自启"),
+                    (DESKTOP_SHORTCUT, "发送到桌面快捷方式"),
+                    (START_MENU_SHORTCUT, "发送到开始菜单"),
                     (SETTINGS, "设置"),
                     (CANCEL, "取消当前任务"),
                     (424, "彻底退出"),

@@ -1,6 +1,6 @@
 [package]
 name = "qingqu-ocr-native"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 rust-version = "1.97.1"
 license = "PolyForm-Noncommercial-1.0.0"
@@ -16,7 +16,7 @@ ferrous-opencc = "0.4"
 md5 = "0.8"
 regex = "1"
 pulldown-cmark = { version = "0.13", default-features = false }
-windows = { version = "0.62", features = ["Win32_UI_Controls_RichEdit", "Win32_System_Com", "Win32_System_Ole", "Win32_System_Variant"] }
+windows = { version = "0.62", features = ["Win32_UI_Controls_RichEdit", "Win32_System_Com", "Win32_System_Ole", "Win32_System_Variant", "Win32_UI_Shell", "Win32_Storage_FileSystem"] }
 unicode-segmentation = "1.13"
 textwrap = { version = "0.16", default-features = false, features = ["unicode-width", "unicode-linebreak"] }
 async-openai = { version = "0.42", default-features = false, features = ["native-tls", "chat-completion", "byot"] }
