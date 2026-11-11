@@ -265,8 +265,7 @@ impl Main {
                                 self.layout(h);
                                 self.set_status(h, "表格已在右栏显示 · 复制按钮可粘贴到 Word / Excel，拖选后 Ctrl+C 复制选中内容");
                             }
-                            if self.settings.auto_translate
-                                && self.settings.show_translation
+                            if self.automatic_translation_enabled()
                                 && !formula
                                 && !vertical
                                 && self.tables.is_empty()

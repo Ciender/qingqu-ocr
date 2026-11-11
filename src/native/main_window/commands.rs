@@ -181,12 +181,18 @@ impl Main {
                         self.open_rendered(h, self.source, false);
                     }
                 }
-                TOGGLE => self.toggle_translation(h, !self.settings.show_translation),
+                TOGGLE => {
+                    if self.settings.show_translation {
+                        self.toggle_translation(h, false);
+                    } else {
+                        self.command(h, TRANSLATE, 0, null_mut());
+                    }
+                }
                 AUTO_TRANSLATE => {
                     self.settings.auto_translate =
                         SendMessageW(GetDlgItem(h.hwnd, AUTO_TRANSLATE as i32), BM_GETCHECK, 0, 0)
                             == BST_CHECKED as isize;
-                    if self.settings.auto_translate {
+                    if self.automatic_translation_enabled() {
                         self.command(h, TRANSLATE, 0, null_mut());
                     }
                 }
@@ -194,6 +200,7 @@ impl Main {
                     let (_, body) = selected(self.source);
                     self.close_document(h);
                     if !self.settings.show_translation {
+                        self.settings.auto_translate = true;
                         self.toggle_translation(h, true);
                     }
                     if body.trim().is_empty() {

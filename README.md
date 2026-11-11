@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4" alt="Windows 10 / 11 x64">
-  <img src="https://img.shields.io/badge/version-0.3.1-2563EB" alt="版本 0.3.1">
+  <img src="https://img.shields.io/badge/version-0.3.2-2563EB" alt="版本 0.3.2">
   <img src="https://img.shields.io/badge/Rust-Win32-DEA584" alt="Rust + Win32">
   <img src="https://img.shields.io/badge/license-Noncommercial-64748B" alt="非商业许可">
 </p>
@@ -29,7 +29,7 @@
 ## 主要功能
 
 - **截图识别**：文字、表格、竖排、公式。
-- **双栏翻译**：多服务、自动翻译、流式输出。
+- **双栏翻译**：原文默认自动检测语言，目标默认简体中文，可手动修改。翻译栏默认收起，打开时翻译一次并勾选自动翻译，收起时暂停自动翻译。支持多服务和流式输出。
 - **文本整理**：编辑、查找、分段、排版、简繁与标点转换。
 - **文档处理**：公式 / Markdown 预览，表格复制到 Word / Excel。
 - **剪贴板窗口**：文字便签、图片浮窗、独立 OCR。
@@ -54,12 +54,21 @@
 
 ## 开始使用
 
-1. 从 [Releases 下载 Windows x64 发布包](https://github.com/Ciender/qingqu-ocr/releases/latest)，解压 `qingqu-ocr-0.3.1-windows-x64.zip`，运行 `qingqu-ocr.exe`。更新前先从托盘彻底退出旧版。
+1. 从 [Releases 下载 Windows x64 发布包](https://github.com/Ciender/qingqu-ocr/releases/latest)，解压 `qingqu-ocr-0.3.2-windows-x64.zip`，运行 `qingqu-ocr.exe`。更新前先从托盘彻底退出旧版。
 2. 打开 **设置 → API 服务**，填写你要使用的服务凭据，以及所需的地域、模型或地址。
 3. 打开 **设置 → 调用配置**，按“功能 → API 服务 → 具体接口”选择各任务的绑定，保存并应用。
 4. 按 **`Alt+Q`** 截图识别，或按 **`Alt+V`** 打开剪贴板文字 / 图片。
 
 图片识别可以跟随文字配置，也可以独立设置。云服务可能收费，程序不提供 API Key；可用接口、语言及账户权限由服务商决定。
+
+### 0.3.2 更新
+
+- 翻译源语言默认“自动检测”，目标默认“简体中文”，均可手动修改；已有语言选择保留。
+- 翻译栏默认收起，“自动翻译”默认勾选；收起时暂停自动翻译，OCR 结果不会触发翻译请求。
+- 打开翻译栏时翻译当前原文或选区一次，并勾选自动翻译；原文为空时只展开，不发送请求。
+- 收起时取消进行中的翻译，迟到的响应不会覆盖内容；收起状态下更改目标语言不会展开或触发翻译。
+
+已有配置中的翻译栏显示状态和其他偏好会保留。
 
 ### 0.3.1 更新
 
@@ -120,7 +129,7 @@
 
 ## 数据与隐私
 
-OCR 图片和待翻译文字发送到你选择的服务；开启自动翻译后，识别结果会继续提交给翻译服务。**`Alt+V` 打开便签或图片本身不上传内容。**
+OCR 图片和待翻译文字发送到你选择的服务；翻译栏展开且勾选自动翻译时，识别结果会继续提交给翻译服务。**`Alt+V` 打开便签或图片本身不上传内容。**
 
 偏好设置保存在 `%LOCALAPPDATA%\QingquOCR\settings.json`，凭据由 Windows DPAPI 加密，保存在同目录的 `credentials.bin`。可通过 `QINGQU_DATA_DIR` 指定独立数据目录。密钥可在配置页显示或隐藏，请勿分享含密钥的截图或凭据文件。
 

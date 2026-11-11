@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4" alt="Windows 10 / 11 x64">
-  <img src="https://img.shields.io/badge/version-0.3.1-2563EB" alt="Version 0.3.1">
+  <img src="https://img.shields.io/badge/version-0.3.2-2563EB" alt="Version 0.3.2">
   <img src="https://img.shields.io/badge/Rust-Win32-DEA584" alt="Rust + Win32">
   <img src="https://img.shields.io/badge/license-Noncommercial-64748B" alt="Noncommercial license">
 </p>
@@ -29,7 +29,7 @@ Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Captu
 ## Features
 
 - **Screen OCR:** text, tables, vertical text, and formulas.
-- **Translation:** two panes, multiple providers, automatic and streaming output.
+- **Translation:** automatic source language detection and Simplified Chinese as editable defaults. The pane starts collapsed; opening it translates once and enables automatic translation, while collapsing it pauses automatic translation. Multiple providers and streaming output are supported.
 - **Text tools:** editing, search, paragraphs, formatting, and Chinese/punctuation conversion.
 - **Documents:** formula / Markdown previews and editable table copying to Word / Excel.
 - **Clipboard windows:** text notes, pinned images, and independent OCR.
@@ -54,12 +54,21 @@ Qingqu OCR is a Windows text recognition tool built with **Rust + Win32**. Captu
 
 ## Getting started
 
-1. [Download the Windows x64 package from Releases](https://github.com/Ciender/qingqu-ocr/releases/latest), extract `qingqu-ocr-0.3.1-windows-x64.zip`, and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
+1. [Download the Windows x64 package from Releases](https://github.com/Ciender/qingqu-ocr/releases/latest), extract `qingqu-ocr-0.3.2-windows-x64.zip`, and run `qingqu-ocr.exe`. Fully exit the previous version from the tray before updating.
 2. Open **Settings → API services** (`设置 → API 服务`). Enter your provider credentials and the required region, model, or endpoint.
 3. Open **Settings → Task bindings** (`设置 → 调用配置`). Choose the task, service, and endpoint, then save and apply.
 4. Press **`Alt+Q`** to capture text, or **`Alt+V`** to open clipboard text / images.
 
 Image OCR can follow the text configuration or use its own binding. Cloud services may charge for requests; the application does not supply API keys. Available endpoints, languages, and account permissions depend on the provider.
+
+### Changes in 0.3.2
+
+- Default to automatic source language detection and Simplified Chinese as the target. Both remain editable, and saved language choices are preserved.
+- Start with the translation pane collapsed and automatic translation checked. Collapsing pauses automatic translation, so OCR results do not trigger translation requests.
+- Opening the pane translates the current source or selection once and checks automatic translation. Empty input opens the pane without a request.
+- Collapsing cancels an active translation and ignores late responses. Changing the target while collapsed does not open the pane or translate.
+
+Existing pane visibility and other saved preferences are preserved.
 
 ### Changes in 0.3.1
 
@@ -120,7 +129,7 @@ Assign shortcuts to other actions in Settings as needed.
 
 ## Data and privacy
 
-OCR images and translation text are sent to your chosen services. Automatic translation also sends recognized text to the configured translation provider. **Opening clipboard notes or images with `Alt+V` does not itself upload content.**
+OCR images and translation text are sent to your chosen services. When the translation pane is expanded and automatic translation is checked, recognized text is also sent to the configured translation provider. **Opening clipboard notes or images with `Alt+V` does not itself upload content.**
 
 Preferences are stored at `%LOCALAPPDATA%\QingquOCR\settings.json`; Windows DPAPI encrypts credentials in `credentials.bin` in the same directory. `QINGQU_DATA_DIR` selects a separate data directory. Keys can be shown or hidden in Settings; do not share credential files or screenshots containing keys.
 

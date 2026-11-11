@@ -261,7 +261,7 @@ impl Default for Translation {
             base_url: "https://index-translate.bilibili.com/v1".into(),
             model: "Index-Translate-35B-A3B".into(),
             source: "auto".into(),
-            target: "英语".into(),
+            target: "简体中文".into(),
             stream: true,
             prompt: "只输出译文，保留原文的段落、列表和公式，不添加解释或思考内容。".into(),
             glossary: String::new(),
@@ -289,7 +289,7 @@ impl Default for Settings {
             default_topmost: false,
             auto_translate: true,
             translation_ui_version: 1,
-            show_translation: true,
+            show_translation: false,
             startup: false,
             hotkeys: ACTIONS
                 .iter()

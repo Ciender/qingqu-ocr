@@ -2,6 +2,13 @@
 use super::*;
 
 impl Main {
+    pub(super) fn automatic_translation_enabled(&self) -> bool {
+        self.settings.auto_translate
+            && self.settings.show_translation
+            && !self.rendered_active
+            && !self.table_active
+    }
+
     pub(super) fn sync_translation_target(&self, h: &Host) {
         unsafe {
             let selector = GetDlgItem(h.hwnd, TARGET_LANGUAGE as i32);
@@ -37,7 +44,7 @@ impl Main {
         if let Err(error) = config::save_preferences(&self.settings) {
             self.set_status(h, error);
         }
-        if self.settings.auto_translate && unsafe { !text(self.source).trim().is_empty() } {
+        if self.automatic_translation_enabled() && unsafe { !text(self.source).trim().is_empty() } {
             self.command(h, TRANSLATE, 0, null_mut());
         }
     }

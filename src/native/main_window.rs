@@ -113,10 +113,8 @@ impl Main {
         settings.normalize_ocr_modes();
         settings.normalize_ocr_language();
         settings.normalize_processing_modes();
-        if settings.translation_ui_version == 0 {
-            settings.auto_translate = settings.show_translation;
-            settings.translation_ui_version = 1;
-        }
+        // Automatic translation is a preference; hiding its pane only suspends it.
+        settings.translation_ui_version = settings.translation_ui_version.max(1);
         // Older preferences used an empty layout as the implicit default.
         // Treat that legacy value as Tianruo-style automatic paragraph
         // splitting when the main window starts, so a fresh OCR result is
@@ -748,15 +746,13 @@ impl Main {
         if self.settings.show_translation == visible {
             return;
         }
-        if !visible {
-            self.settings.auto_translate = false;
-            if self
+        if !visible
+            && self
                 .pending
                 .as_ref()
                 .is_some_and(|p| matches!(p.purpose, Purpose::Translate))
-            {
-                self.cancel(h);
-            }
+        {
+            self.cancel(h);
         }
         unsafe {
             let mut r = RECT::default();
